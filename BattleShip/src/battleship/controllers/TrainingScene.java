@@ -143,9 +143,10 @@ public class TrainingScene {
      */
     static void initialStatisticInformation() {
         information = new Label();
+        information.setWrapText(true);
         infoRow.getChildren().add(information);
         infoRow.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
-            globalFont = Font.font(newValue.getHeight()/10);
+            globalFont = Font.font(Math.min(newValue.getHeight()/10, newValue.getWidth() / 17));
             information.setFont(globalFont);
         });
 
