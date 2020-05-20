@@ -58,7 +58,7 @@ public class TrainingScene {
         if(globalFont == null) globalFont = new Font(12);
         sunkedShips = 0;
 
-        Parent root = BattleshipGame.getBattleRoot();
+        Parent root = BattleshipGame.getTrainingRoot();
 
         //Part about battle square (map)
         if (buttons == null) {
@@ -79,7 +79,7 @@ public class TrainingScene {
             infoRow = (Pane)root.lookup("#infoRow");
             initialStatisticInformation();
         }
-        information.setText(BattleshipGame.getGameStatistic());
+        information.setText(BattleshipGame.getTrainStatistic());
 
         //Part about control UI (shoot settings and shoot button)
         if(horizontal == null) {
@@ -101,7 +101,7 @@ public class TrainingScene {
     static void installField() {
         buttons = new Button[10][10];
         for(int i = 1; i < 11; i++) {
-            Image img = new Image("battleship/resources/numbers/"+ ((9 + i) % 10) + ".png");
+            Image img = new Image(TrainingScene.class.getResourceAsStream("/battleship/resources/numbers/"+ ((9 + i) % 10) + ".png"));
             ImageView numHor = new ImageView(img);
             ImageView numVer = new ImageView(img);
             numHor.setFitHeight(30);
@@ -336,7 +336,7 @@ public class TrainingScene {
         }
         if(sunkedShips == 10)
             WinGame();
-        information.setText(BattleshipGame.getGameStatistic());
+        information.setText(BattleshipGame.getTrainStatistic());
     }
 
     /**

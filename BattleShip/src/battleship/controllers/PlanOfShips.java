@@ -1,16 +1,17 @@
 package battleship.controllers;
 
 import battleship.BattleshipGame;
+import battleship.connection.Launcher;
+import battleship.resources.messages.Messages;
 import battleship.resources.styles.Styles;
 import battleship.ships.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
@@ -51,7 +52,9 @@ public class PlanOfShips {
 
     @FXML
     static GridPane okCancelGrid;
-    static Button okButton;
+    static Button startButton;
+    static Button hostButton;
+    static Button connectButton;
     static Button cancelButton;
 
     static Image[][] shipsimg;
@@ -60,15 +63,24 @@ public class PlanOfShips {
     static ImageView[] shipImg;
 
 
+    @FXML
+    static GridPane chatTable;
+    @FXML
+    static ScrollPane chatScrollPane;
+    static Label chatText;
+    @FXML
+    static GridPane messageTable;
+    static TextField messageText;
+    static Button sendMessageButton;
     /**
      * This method should be used for initializing the planning scene
      */
-    public static void init(){
+    public static void init(String param){
         choosenLen = 4;
         isAdd = true;
         vertival = false;
         addingShip = new Battleship();
-        globalFont = Font.font(20);
+        globalFont = Font.font(17);
         initialImages();
         for(int i = 0; i < 4; i++)
             remainedNumShips[i] = 4 - i;
@@ -110,15 +122,70 @@ public class PlanOfShips {
             rightMenu[3] = (GridPane) root.lookup("#fourth");
 
             initialShipMenu();
-            for(int i = 0; i < 4; i++)
-                updateRemainedNumOfShip(i);
+        }
+        for(int i = 0; i < 4; i++)
+            updateRemainedNumOfShip(i);
+        //Part about chat
+        if (chatTable == null) {
+            System.out.println("bgidfsl  " + param + ";");
+            chatTable = (GridPane) root.lookup("#chatTable");
+            chatScrollPane = (ScrollPane) root.lookup("#chatScrollPane");
+            chatScrollPane.focusedProperty().addListener((e, oldVal, newVal) -> {
+                if(newVal)
+                    messageText.requestFocus();
+            });
+            messageTable = (GridPane) root.lookup("#messageTable");
+            initialChatTableUI();
+        }
+        if(param != null && param.matches("S")){
+            chatText.setText(BattleScene.getChatLabel().getText());
         }
 
-        //Part about continue or back to menu
+
+        messageText.setText("");
+
+
+        //Part about buttons
         if (okCancelGrid == null) {
             okCancelGrid = (GridPane) root.lookup("#okCancelGrid");
             initialOkCancelButtons();
         }
+        lostConnection();
+
+
+    }
+
+
+    static void initialChatTableUI() {
+        chatText = new Label();
+        chatText.setPrefWidth(10000);
+        chatText.setWrapText(true);
+        chatScrollPane.setFitToWidth(true);
+        chatScrollPane.setContent(chatText);
+
+        messageText = new TextField();
+        messageText.setOnKeyPressed(e -> {
+            KeyCode code = e.getCode();
+            if(code.equals(KeyCode.ENTER) && !sendMessageButton.isDisable())
+                sendMessage();
+        });
+        sendMessageButton = new Button("Отправить");
+        sendMessageButton.setOnAction(e -> sendMessage());
+        messageTable.add(messageText,0,0);
+        messageTable.add(sendMessageButton,1,0);
+    }
+
+    static void sendMessage(){
+        String message = messageText.getText();
+        if(message != null && message.length() != 0){
+            Launcher.sendMessage(message, 'M');
+            writeMessage("Вы: " + message);
+            messageText.setText("");
+        }
+    }
+
+    public static Label getChatLabel(){
+        return chatText;
     }
 
     /**
@@ -231,6 +298,10 @@ public class PlanOfShips {
                 buttons[x][y] = btn;
                 btn.setPrefWidth(10000);
                 btn.setPrefHeight(10000);
+                buttons[x][y].focusedProperty().addListener((e, oldVal, newVal) -> {
+                    if(newVal)
+                        messageText.requestFocus();
+                });
                 btn.setOnMouseClicked(event -> {
                     if(event.getButton() == MouseButton.PRIMARY)
                         doThingWithShip(x,y);
@@ -339,26 +410,26 @@ public class PlanOfShips {
             shipImg = new ImageView[4];
             remainedNumShips = new int[4];
 
-            restImage = new Image(("battleship/resources/images/sea.jpeg"));
+            restImage = new Image(PlanOfShips.class.getResourceAsStream("/battleship/resources/images/sea.jpeg"));
             restImageView = new ImageView(restImage);
-//            restImageView.setFitWidth();
+
 
             for(int i = 0; i < 4; i++){
-                shipsimg[i][0] = new Image("battleship/resources/ships/shipl" + (i + 1) + "h.png");
-                shipsimg[i][1] = new Image("battleship/resources/ships/shipl" + (i + 1) + "v.png");
+                shipsimg[i][0] = new Image(PlanOfShips.class.getResourceAsStream("/battleship/resources/ships/shipl" + (i + 1) + "h.png"));
+                shipsimg[i][1] = new Image(PlanOfShips.class.getResourceAsStream("/battleship/resources/ships/shipl" + (i + 1) + "v.png"));
             }
 
             for(int i = 0; i < 10; i++)
-                numbersImage[i] = new Image("battleship/resources/numbers/"+i+".png");
+                numbersImage[i] = new Image(PlanOfShips.class.getResourceAsStream("/battleship/resources/numbers/"+i+".png"));
 
             for(int i = 0; i < 4; i++) {
                 remainedShips[i] = new ImageView(numbersImage[4 - i]);
-                remainedShips[i].setFitWidth(80);
-                remainedShips[i].setFitHeight(80);
+                remainedShips[i].setFitWidth(66);
+                remainedShips[i].setFitHeight(66);
 
                 shipImg[i] = new ImageView(shipsimg[i][vertival ? 0 : 1]);
-                shipImg[i].setFitHeight(80);
-                shipImg[i].setFitWidth(80);
+                shipImg[i].setFitHeight(66);
+                shipImg[i].setFitWidth(66);
             }
         }
     }
@@ -367,23 +438,35 @@ public class PlanOfShips {
      * Initial buttons continue and remove to main menu
      */
     static void initialOkCancelButtons() {
-        okButton = new Button("Найти противника!");
-        okButton.setFont(globalFont);
-        okButton.setPrefWidth(10000);
-        okButton.setPrefHeight(10000);
-        okButton.setOnAction(e -> confirmOk());
-
         cancelButton = new Button("Вернуться в меню");
         cancelButton.setPrefWidth(10000);
         cancelButton.setPrefHeight(10000);
         cancelButton.setFont(globalFont);;
-        cancelButton.setOnAction(e -> {
-            if (confirmCancel())
-                BattleshipGame.backToMenu();
-        });
+        cancelButton.setOnAction(e -> confirmCancel());
 
-        okCancelGrid.add(cancelButton,0,0);
-        okCancelGrid.add(okButton,0,2);
+        startButton = new Button("Оффлайн сражение!");
+        startButton.setFont(globalFont);
+        startButton.setPrefWidth(10000);
+        startButton.setPrefHeight(10000);
+        startButton.setOnAction(e -> confirmSolo());
+
+        hostButton = new Button("Ожидать противника!");
+        hostButton.setFont(globalFont);
+        hostButton.setPrefWidth(10000);
+        hostButton.setPrefHeight(10000);
+        hostButton.setOnAction(e -> confirmHost());
+
+        connectButton = new Button("Найти противника!");
+        connectButton.setFont(globalFont);
+        connectButton.setPrefWidth(10000);
+        connectButton.setPrefHeight(10000);
+        connectButton.setOnAction(e -> confirmConnect());
+
+
+        okCancelGrid.add(cancelButton,2,2);
+        okCancelGrid.add(startButton,2,3);
+        okCancelGrid.add(hostButton,2,4);
+        okCancelGrid.add(connectButton,2,5);
     }
 
     /**
@@ -392,7 +475,7 @@ public class PlanOfShips {
      *      {true}  -   remove to main menu
      *      {false} -   don't remove
      */
-    static boolean confirmCancel() {
+    static void confirmCancel() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setTitle("Подтверждение действия");
@@ -401,20 +484,144 @@ public class PlanOfShips {
 
         Optional<ButtonType> option = alert.showAndWait();
 
-        return option.isPresent() && option.get() == ButtonType.OK;
+        if (option.isPresent() && option.get() == ButtonType.OK)
+            BattleshipGame.backToMenu();
     }
 
     /**
      * Player want to play multiplayer :c
      */
-    static void confirmOk() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.setTitle("Информационное сообщение");
-        alert.setHeaderText("Мультиплеер еще не реализован.");
-        alert.setContentText("Но вы попытались!");
-        alert.showAndWait();
+    static void confirmSolo() {
+        BattleshipGame.startSoloGame();
     }
+
+    static void confirmMultiple() {
+        BattleshipGame.startMultipleGame();
+    }
+
+    static void confirmHost() {
+        BattleshipGame.launchSimpleHostDialog();
+    }
+
+    static void confirmConnect() {
+        BattleshipGame.launchSimpleConnectDialog();
+    }
+
+    static void confirmStop(){
+        clickedStop();
+        Launcher.stop();
+    }
+
+    static void confirmDisconnect(){
+        Launcher.send("S",'Q');
+        PlanOfShips.writeMessage("Системное: вы отключились от игры.");
+    }
+
+    static public void clickedStartHost(){
+        startButton.setDisable(true);
+
+        cancelButton.setDisable(true);
+
+        if(BattleshipGame.canBeServer()) {
+            hostButton.setText("Прекратить ожидание");
+            hostButton.setOnAction(e -> confirmStop());
+            hostButton.setDisable(false);
+        }
+
+        if(BattleshipGame.canBeClient())
+            connectButton.setDisable(true);
+
+        sendMessageButton.setDisable(true);
+    }
+
+    static public void clickedStartConnect(){
+        startButton.setDisable(true);
+
+        cancelButton.setDisable(true);
+
+        if(BattleshipGame.canBeServer())
+            hostButton.setDisable(true);
+
+        if(BattleshipGame.canBeClient()) {
+            connectButton.setText("Прекратить поиск");
+            connectButton.setOnAction(e -> confirmStop());
+            connectButton.setDisable(false);
+        }
+
+        sendMessageButton.setDisable(true);
+    }
+
+    static public void clickedStop(){
+        startButton.setDisable(false);
+
+        cancelButton.setDisable(false);
+
+        if(BattleshipGame.canBeServer()) {
+            hostButton.setText("Ожидать противника!");
+            hostButton.setOnAction(e -> confirmHost());
+            hostButton.setDisable(false);
+        }
+
+        if(BattleshipGame.canBeClient()) {
+            connectButton.setText("Найти противника!");
+            connectButton.setOnAction(e -> confirmConnect());
+            connectButton.setDisable(false);
+        }
+
+        sendMessageButton.setDisable(true);
+    }
+
+    static public void getConnection(){
+        startButton.setText("Онлайн сражение!");
+        startButton.setOnAction(e -> confirmMultiple());
+        startButton.setDisable(false);
+
+        cancelButton.setText("Отключиться");
+        cancelButton.setOnAction(e -> confirmDisconnect());
+        cancelButton.setDisable(false);
+
+        if(BattleshipGame.canBeServer())
+            hostButton.setDisable(true);
+
+        if(BattleshipGame.canBeClient())
+            connectButton.setDisable(true);
+
+        sendMessageButton.setDisable(false);
+    }
+
+    static public void lostConnection() {
+        startButton.setText("Оффлайн сражение!");
+        startButton.setOnAction(e -> confirmSolo());
+        startButton.setDisable(false);
+
+        cancelButton.setText("Вернуться в меню");
+        cancelButton.setOnAction(e -> confirmCancel());
+        cancelButton.setDisable(false);
+
+        if(BattleshipGame.canBeServer()) {
+            hostButton.setText("Ожидать противника!");
+            hostButton.setOnAction(e -> confirmHost());
+            hostButton.setDisable(false);
+        } else
+            hostButton.setDisable(true);
+
+        if(BattleshipGame.canBeClient()) {
+            connectButton.setText("Найти противника!");
+            connectButton.setOnAction(e -> confirmConnect());
+            connectButton.setDisable(false);
+        } else
+            connectButton.setDisable(true);
+
+        sendMessageButton.setDisable(true);
+    }
+
+    static public void writeMessage(String message){
+        chatText.setText(chatText.getText() + message + "\n" );
+        chatText.heightProperty().addListener(observable -> {
+            chatScrollPane.setVvalue(1.0);
+        });
+    }
+
 
     /**
      * Initial controls of doing
@@ -498,8 +705,8 @@ public class PlanOfShips {
         for(int i = 0; i < 4; i++) {
             final int lenShip = i + 1;
             shipImg[i].setImage(shipsimg[i][vertival? 0 : 1]);
-            rightMenu[i].add(shipImg[i], 3, 0);
-            rightMenu[i].add(remainedShips[i], 1,0);
+            rightMenu[i].add(shipImg[i], 2, 0);
+            rightMenu[i].add(remainedShips[i], 0,0);
             rightMenu[i].setStyle(Styles.getPaneBordersStyle());
             rightMenu[i].setOnMouseClicked(e -> chooseLenShip(lenShip));
         }
@@ -533,5 +740,5 @@ public class PlanOfShips {
         for(int i = 0; i < 4; i++)
             rightMenu[i].setStyle(Styles.getPaneBordersStyle());
     }
-    }
+}
 

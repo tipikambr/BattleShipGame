@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="c6dab476-cbd4-4405-9e2c-a379622e5430" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="module-info" />
+        <option value="FxmlFile" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1c2QPzCI0JJQ1hVyTJ0eWRsshIG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PATH_TO_FX$/src.zip!/" />
+    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.proportion" value="0.15625" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="preferences.pathVariables" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\git\BattleShipGame\BattleShip\src\battleship\resources\client-server" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.BattleshipGame">
+    <configuration name="BattleshipGame" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="battleship.BattleshipGame" />
+      <module name="BattleShip" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="battleship.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="launcher" type="BatchConfigurationType" factoryName="Batch" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/out/artifacts/BattleShip_jar" />
+      <option name="PARENT_ENVS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="launcher.bat" />
+      <option name="PARAMETERS" value="server" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="launcherAsClient" type="BatchConfigurationType" factoryName="Batch" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="WORKING_DIRECTORY" value="C:\git\BattleShipGame\BattleShip\out\artifacts\BattleShip_jar" />
+      <option name="PARENT_ENVS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="launcherAsClient.bat" />
+      <option name="PARAMETERS" value="" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="launcherAsServer" type="BatchConfigurationType" factoryName="Batch" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="WORKING_DIRECTORY" value="C:\git\BattleShipGame\BattleShip\out\artifacts\BattleShip_jar" />
+      <option name="PARENT_ENVS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="launcherAsServer.bat" />
+      <option name="PARAMETERS" value="" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BattleShip.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/out/artifacts/BattleShip_jar/BattleShip.jar" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Application.BattleshipGame" />
+      <item itemvalue="Batch.launcher" />
+      <item itemvalue="Batch.launcherAsClient" />
+      <item itemvalue="Batch.launcherAsServer" />
+      <item itemvalue="JAR Application.BattleShip.jar" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.BattleshipGame" />
+        <item itemvalue="Batch.launcherAsServer" />
+        <item itemvalue="Batch.launcherAsClient" />
+        <item itemvalue="Batch.launcher" />
+        <item itemvalue="JAR Application.BattleShip.jar" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c6dab476-cbd4-4405-9e2c-a379622e5430" name="Default Changelist" comment="" />
+      <created>1589724188287</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1589724188287</updated>
+      <workItem from="1589724191012" duration="12313000" />
+      <workItem from="1589737238488" duration="147388000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.ini" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="222" y="66" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1589929659178">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="222" y="66" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1589929659178" />
+    <state x="515" y="214" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1589900415327">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="515" y="214" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1536.824@0.0.1536.824" timestamp="1589900415327" />
+    <state x="573" y="123" key="#com.intellij.ide.util.MemberChooser" timestamp="1589762437095">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="573" y="123" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1589762437095" />
+    <state x="476" y="195" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1589817892185">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="476" y="195" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.824@0.0.1536.824" timestamp="1589817892185" />
+    <state x="498" y="158" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1589820274423">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="498" y="158" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1589820274423" />
+    <state x="522" y="114" key="DetectedRootsChooserDialog" timestamp="1589724297129">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="522" y="114" key="DetectedRootsChooserDialog/0.0.1536.824@0.0.1536.824" timestamp="1589724297129" />
+    <state x="472" y="152" key="FileChooserDialogImpl" timestamp="1589835014851">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="472" y="152" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1589835014851" />
+    <state width="1491" height="189" key="GridCell.Tab.0.bottom" timestamp="1589970583569">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1491" height="189" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1589970583569" />
+    <state width="1491" height="189" key="GridCell.Tab.0.center" timestamp="1589970583569">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1491" height="189" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1589970583569" />
+    <state width="1491" height="189" key="GridCell.Tab.0.left" timestamp="1589970583568">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1491" height="189" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1589970583568" />
+    <state width="1491" height="189" key="GridCell.Tab.0.right" timestamp="1589970583569">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1491" height="189" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1589970583569" />
+    <state width="1491" height="250" key="GridCell.Tab.1.bottom" timestamp="1589970583564">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1491" height="250" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1589970583564" />
+    <state width="1491" height="250" key="GridCell.Tab.1.center" timestamp="1589970583564">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1491" height="250" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1589970583564" />
+    <state width="1491" height="250" key="GridCell.Tab.1.left" timestamp="1589970583564">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1491" height="250" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1589970583564" />
+    <state width="1491" height="250" key="GridCell.Tab.1.right" timestamp="1589970583564">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1491" height="250" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1589970583564" />
+    <state x="438" y="113" width="779" height="604" key="NewModule_or_Project.wizard" timestamp="1589759256167">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="438" y="113" width="779" height="604" key="NewModule_or_Project.wizard/0.0.1536.824@0.0.1536.824" timestamp="1589759256167" />
+    <state x="226" y="0" key="SettingsEditor" timestamp="1589835017523">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="226" y="0" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1589835017523" />
+    <state x="463" y="234" key="com.intellij.ide.util.TipDialog" timestamp="1589737267788">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="463" y="234" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1589737267788" />
+    <state x="497" y="304" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1589724329888">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="497" y="304" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1536.824@0.0.1536.824" timestamp="1589724329888" />
+    <state x="418" y="30" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1589729432456">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="418" y="30" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1536.824@0.0.1536.824" timestamp="1589729432456" />
+    <state x="498" y="176" key="extract.method.dialog" timestamp="1589935881482">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="498" y="176" key="extract.method.dialog/0.0.1536.824@0.0.1536.824" timestamp="1589935881482" />
+    <state x="425" y="187" key="run.anything.popup" timestamp="1589928317569">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1589928317569" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1589798732917">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1589798732917" />
+  </component>
+</project>

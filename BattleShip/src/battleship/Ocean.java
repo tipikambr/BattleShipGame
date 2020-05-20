@@ -31,7 +31,6 @@ public class Ocean {
         hitCount = 0;
     }
 
-
     //Getters
 
     /**

@@ -78,7 +78,7 @@ public class MainMenuScene {
      * Launch training scene
      */
     static void clickStartSoloGame() {
-        BattleshipGame.startSoloGame();
+        BattleshipGame.startTrainGame();
         helloMessage();
     }
 
@@ -86,7 +86,7 @@ public class MainMenuScene {
      * Launch planning scene
      */
     static void clickMultiplayerGame() {
-        BattleshipGame.beginPlanBattlePlace();
+        BattleshipGame.beginPlanBattlePlace("");
     }
 
     /**
@@ -98,7 +98,14 @@ public class MainMenuScene {
         alert.setTitle("Информационное сообщение");
         alert.setHeaderText("Приложение написано студентом группы БПИ184\n" +
                 "Ухлином Михаилом Алексеевичем");
-        alert.setContentText("На данный момент мультиплеер полностью не реализован, но вы можете попробовать");
+        alert.setContentText("Надеюсь, я не забыл потом обновить это сообшение, но если забыл, то как-то так :)\n" +
+                "Приложение может быть как сервером или клиентом, так и выполнять обе функции. Параметры запуска:\n" +
+                "\"server\" - сервер\n" +
+                "\"client\" - клиент\n" +
+                "Без параметров - и то, и другое сразу.\n" +
+                "Чтобы добавить или убрать ненужные ip-адреса или порты, да и в целом посмотреть на сохраняемый файл - посмотрите файл info.ini\n" +
+                "//TODO описать там все\n" +
+                "У меня не было возможности проверить, возможно ли восстановить связь после потери интернета, если в комментариях напишите, работает она или нет - буду чень благодарен.");
         alert.showAndWait();
     }
 

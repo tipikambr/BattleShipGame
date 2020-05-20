@@ -1,7 +1,6 @@
 package battleship.resources.messages;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
 public class Messages {
@@ -16,6 +15,9 @@ public class Messages {
     private static ArrayList<String> shootInShipMessages;
     private static ArrayList<String> destroyShipMessage;
     private static ArrayList<String> understandMessage;
+    private static ArrayList<String> notNyTurnMessages;
+    private static ArrayList<String> notTimeYetMessage;
+    private static ArrayList<String> lostConnectionInBattleMessages;
 
 
     static {
@@ -102,6 +104,25 @@ public class Messages {
                 "преимущество врагу в сражении с нами");
     }
 
+    static {
+        notNyTurnMessages = new ArrayList<>();
+        notNyTurnMessages.add("- Знаешь, бывает времена, когда хочется пойти и нарушить все, даже пиратские, правила? \n" +
+                "- Да нет, я считаю кодекс святым, и уверен, наш капитан также считает!\n\n" +
+                "Вы слышите этот разговор, и передумываете делать запретный ход");
+    }
+
+    static {
+        notTimeYetMessage = new ArrayList<>();
+        notTimeYetMessage.add("К вам подходит ваш улыбающийся помшник облокачивается на борт корабля, смотря на небо, и говорит: " +
+                "\"Капитан, враги еще не подготовились к бою, давайте еще немного подождем, да и погодка благоволит.\"");
+    }
+
+    static {
+        lostConnectionInBattleMessages = new ArrayList<>();
+        lostConnectionInBattleMessages.add("Ваш помошник подходит к вам и растерянно говорит:\"Капитааан, я не уверен, но кажется враги сдались, или мы победили, или нам повезло. Вообще не понятно." +
+                "Все вражеские корабли просто исчезли!");
+    }
+
     public static String SalagaAttentionMessages() {return salagaAttentionMessages.get(rand.nextInt(salagaAttentionMessages.size()));}
     public static String DisunderstandingAimMessages() {return disunderstandingAimMessages.get(rand.nextInt(disunderstandingAimMessages.size()));}
     public static String ShootInFireShipMessages() {return shootInFireShipMessages.get(rand.nextInt(shootInFireShipMessages.size()));}
@@ -111,5 +132,7 @@ public class Messages {
     public static String ShootInShipMessages() {return shootInShipMessages.get(rand.nextInt(shootInShipMessages.size()));}
     public static String DestroyShipMessage() {return destroyShipMessage.get(rand.nextInt(destroyShipMessage.size()));}
     public static String UnderstandMessage() {return understandMessage.get(rand.nextInt(understandMessage.size()));}
-
+    public static String NotNyTurnMessages() { return notNyTurnMessages.get(rand.nextInt(notNyTurnMessages.size()));}
+    public static String NotTimeYetMessages() { return notTimeYetMessage.get(rand.nextInt(notTimeYetMessage.size()));}
+    public static String LostConnectionMessages() {return lostConnectionInBattleMessages.get(rand.nextInt(lostConnectionInBattleMessages.size()));}
 }
