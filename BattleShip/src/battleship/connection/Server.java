@@ -26,7 +26,8 @@ public class Server extends Connection{
     @Override
     public void run() {
         running = true;
-        start();
+        if (!start())
+            return;
 
         if(!getConnection()){
             Launcher.stop();
@@ -37,7 +38,7 @@ public class Server extends Connection{
 
     }
 
-    private void start() {
+    private boolean start() {
         try {
             server = new ServerSocket(port.port, 1);
 
@@ -48,9 +49,9 @@ public class Server extends Connection{
                     e.printStackTrace();
                 }
             });
-
+            return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
     }
 

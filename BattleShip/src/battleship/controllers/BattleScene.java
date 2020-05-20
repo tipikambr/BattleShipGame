@@ -12,10 +12,21 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 import java.util.Optional;
 
 public class BattleScene {
+    final static String shootSoundPath = BattleScene.class.getResource("/battleship/resources/sounds/shoot.mp3").toString();
+    final static String missSoundPath = BattleScene.class.getResource("/battleship/resources/sounds/miss.mp3").toString();
+    final static String aimSoundPath = BattleScene.class.getResource("/battleship/resources/sounds/boom.mp3").toString();
+    static MediaPlayer shootPlayer;
+    static MediaPlayer missShoot;
+    static MediaPlayer aimShoot;
+
+
     static Boolean isOnline;
     static Boolean isMyTurn;
     static Boolean isReady = null;
@@ -66,12 +77,31 @@ public class BattleScene {
         }
         installField(myOceanButtons, myOcean, true);
 
+        if(shootPlayer == null){
+            shootPlayer = new MediaPlayer(new Media(shootSoundPath));
+            shootPlayer.setVolume(0.5);
+            shootPlayer.setRate(2.0);
+            missShoot = new MediaPlayer(new Media(missSoundPath));
+            missShoot.setVolume(0.1);
+            missShoot.setRate(2.0);
+            aimShoot = new MediaPlayer(new Media(aimSoundPath));
+            aimShoot.setVolume(0.2);
+            aimShoot.setRate(2.0);
+        }
+
         if(opponentOcean == null) {
             opponentOcean = (GridPane) root.lookup("#opponentOcean");
             opponentOceanButtons = new Button[10][10];
             installField(opponentOceanButtons, opponentOcean, false);
         } else
             makeAllSeaClear(opponentOceanButtons);
+        for(int i = 0; i < 10; i++)
+            for(int j = 0; j < 10; j++){
+                int x = i;
+                int y = j;
+                opponentOceanButtons[i][j].setOnAction(event -> shootAt(x, y));
+            }
+
 
         if(chatGrid == null) {
             chatGrid = (GridPane) root.lookup("#chatFrid");
@@ -127,7 +157,6 @@ public class BattleScene {
             makeMySeaSquareTruth(ship, BattleshipGame.getMyOcean(), x, y);
         else {
             makeSeaClear(ship);
-            ship.setOnAction(event -> shootAt(x, y));
         }
     }
 
@@ -169,6 +198,8 @@ public class BattleScene {
         defeat.setMaxWidth(74);
         defeat.setOnAction(e -> {
             if(salagaAttention()){
+                BattleshipGame.beginPlanBattlePlace("S");
+                PlanOfShips.getConnection();
                 Launcher.send("SE " + BattleshipGame.convertStatistic(), 'D');
             }
         });
@@ -225,7 +256,10 @@ public class BattleScene {
             messageNotTimeYet();
             return;
         }
+        opponentOceanButtons[x][y].setOnAction(null);
 
+        shootPlayer.seek(new Duration(0));
+        shootPlayer.play();
         Launcher.send(" " + x + " " + y, 'A');
         Launcher.send("GET", 'I');
         isMyTurn = false;
@@ -235,10 +269,18 @@ public class BattleScene {
         int type = BattleshipGame.getMyOcean().shootAt(x, y);
         makeMySeaSquareTruth(myOceanButtons[x][y], BattleshipGame.getMyOcean(), x, y);
         Launcher.send("GET", 'I');
-        if(type != 1 && type != 2)
+        if(type != 1 && type != 2){
             isMyTurn = true;
+            missShoot.seek(new Duration(0.0));
+            missShoot.play();
+        } else
+        {
+            aimShoot.seek(new Duration(0.0));
+            aimShoot.play();
+        }
         if(BattleshipGame.getMyOcean().isGameOver())
             Launcher.send("SF " + BattleshipGame.convertStatistic(), 'D');
+
         return type;
     }
 
@@ -278,10 +320,11 @@ public class BattleScene {
                 break;
             case 1:
                 square.setStyle(Styles.getSunkedShipStyle());
-                sunkShip(myOceanButtons, x, y, false);
+                sunkShip(myOceanButtons, x, y, true, true, false);
                 break;
             case 2:
                 square.setStyle(Styles.getFireShipStyle());
+                shootedInFireShip(myOceanButtons,x,y, false);
                 break;
             case 3:
                 square.setStyle(Styles.getMyShipStyle());
@@ -293,85 +336,121 @@ public class BattleScene {
         switch (res){
             case -2:
             case -1:
-                settingStyleButton(opponentOceanButtons[x][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                settingStyleButton(opponentOceanButtons[x][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), true);
                 break;
             case 0:
-                settingStyleButton(opponentOceanButtons[x][y], Styles.getNotShootedSeaStyle(), Styles.getExtractedNotShootedSeaStyle());
+                settingStyleButton(opponentOceanButtons[x][y], Styles.getNotShootedSeaStyle(), Styles.getExtractedNotShootedSeaStyle(), true);
                 break;
             case 1:
-                settingStyleButton(opponentOceanButtons[x][y], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle());
-                sunkShip(opponentOceanButtons, x,y, true);
+                settingStyleButton(opponentOceanButtons[x][y], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle(), true);
+                sunkShip(opponentOceanButtons, x,y, true, true, true);
                 isMyTurn = true;
                 break;
             case 2:
-                settingStyleButton(opponentOceanButtons[x][y], Styles.getFireShipStyle(), Styles.getExtractedFireShipStyle());
-                shootedInFireShip(opponentOceanButtons, x,y);
+                settingStyleButton(opponentOceanButtons[x][y], Styles.getFireShipStyle(), Styles.getExtractedFireShipStyle(), true);
+                shootedInFireShip(opponentOceanButtons, x,y, true);
                 isMyTurn = true;
                 break;
             case 3:
-                settingStyleButton(opponentOceanButtons[x][y], Styles.getMyShipStyle(), Styles.getMyShipStyle());
+                settingStyleButton(opponentOceanButtons[x][y], Styles.getMyShipStyle(), Styles.getMyShipStyle(), true);
                 break;
 
         }
     }
 
-    static void shootedInFireShip(Button[][] ocean, int x, int y) {
-        if(x > 0 && y > 0)
-            settingStyleButton(ocean[x-1][y-1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-
-        if(x > 0 && y < 9)
-            settingStyleButton(ocean[x-1][y+1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-
-        if(x < 9 && y > 0)
-            settingStyleButton(ocean[x+1][y-1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-
-        if(x < 9 && y < 9)
-            settingStyleButton(ocean[x+1][y+1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+    static void shootedInFireShip(Button[][] ocean, int x, int y, boolean isExtractable) {
+        if(x > 0 && y > 0) {
+            ocean[x-1][y-1].setOnAction(null);
+            settingStyleButton(ocean[x - 1][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+        }
+        if(x > 0 && y < 9) {
+            settingStyleButton(ocean[x - 1][y + 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+            ocean[x-1][y+1].setOnAction(null);
+        }
+        if(x < 9 && y > 0) {
+            settingStyleButton(ocean[x + 1][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+            ocean[x+1][y-1].setOnAction(null);
+        }
+        if(x < 9 && y < 9){
+            settingStyleButton(ocean[x+1][y+1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+            ocean[x+1][y+1].setOnAction(null);
+        }
     }
 
-    static void sunkShip(Button[][] ocean, int x, int y, boolean mark) {
+    static void sunkShip(Button[][] ocean, int x, int y, boolean mark, boolean disable, boolean isExtractable) {
         int tx, ty;
 
         tx = x - 1;
         while(tx >= 0)
             if(ocean[tx][y].getStyle().equals(Styles.getFireShipStyle()) || ocean[tx][y].getStyle().equals(Styles.getExtractedFireShipStyle())){
-                settingStyleButton(ocean[tx][y], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle());
+                settingStyleButton(ocean[tx][y], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle(), isExtractable);
+                if(disable)
+                    ocean[tx][y].setOnAction(null);
                 if(mark) {
-                    if (y > 0)
-                        settingStyleButton(ocean[tx][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (y < 9)
-                        settingStyleButton(ocean[tx][y + 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                    if (y > 0) {
+                        settingStyleButton(ocean[tx][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[tx][y-1].setOnAction(null);
+                    }
+                    if (y < 9) {
+                        settingStyleButton(ocean[tx][y + 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if (disable)
+                            ocean[tx][y + 1].setOnAction(null);
+                    }
                 }
                 tx--;
             } else {
                 if(mark){
-                    settingStyleButton(ocean[tx][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if(y > 0)
-                        settingStyleButton(ocean[tx][y-1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if(y < 9)
-                        settingStyleButton(ocean[tx][y+1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                    settingStyleButton(ocean[tx][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                    if(disable)
+                        ocean[tx][y].setOnAction(null);
+                    if(y > 0) {
+                        settingStyleButton(ocean[tx][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[tx][y - 1].setOnAction(null);
+                    }
+                    if(y < 9) {
+                        settingStyleButton(ocean[tx][y + 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[tx][y + 1].setOnAction(null);
+                    }
                 }
                 break;
            }
         tx = x + 1;
         while(tx <= 9)
             if(ocean[tx][y].getStyle().equals(Styles.getFireShipStyle()) || ocean[tx][y].getStyle().equals(Styles.getExtractedFireShipStyle())){
-                settingStyleButton(ocean[tx][y], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle());
+                settingStyleButton(ocean[tx][y], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle(), isExtractable);
+                if(disable)
+                    ocean[tx][y].setOnAction(null);
                 if(mark) {
-                    if (y > 0)
-                        settingStyleButton(ocean[tx][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-
-                    if (y < 9)
-                        settingStyleButton(ocean[tx][y + 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                    if (y > 0) {
+                        settingStyleButton(ocean[tx][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[tx][y - 1].setOnAction(null);
+                    }
+                    if (y < 9){
+                        settingStyleButton(ocean[tx][y + 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[tx][y + 1].setOnAction(null);
+                    }
                 }
                 tx++;
             } else {
                 if(mark) {
-                    settingStyleButton(ocean[tx][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (y > 0)
-                        settingStyleButton(ocean[tx][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (y < 9)
-                        settingStyleButton(ocean[tx][y + 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                    settingStyleButton(ocean[tx][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                    if(disable)
+                        ocean[tx][y].setOnAction(null);
+                    if (y > 0) {
+                        settingStyleButton(ocean[tx][y - 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[tx][y - 1].setOnAction(null);
+                    }
+                    if (y < 9){
+                        settingStyleButton(ocean[tx][y + 1], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[tx][y + 1].setOnAction(null);
+                    }
                 }
                 break;
             }
@@ -379,21 +458,37 @@ public class BattleScene {
         ty = y - 1;
         while(ty >= 0)
             if(ocean[x][ty].getStyle().equals(Styles.getFireShipStyle()) || ocean[x][ty].getStyle().equals(Styles.getExtractedFireShipStyle())){
-                settingStyleButton(ocean[x][ty], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle());
+                settingStyleButton(ocean[x][ty], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle(), isExtractable);
+                if(disable)
+                    ocean[x][ty].setOnAction(null);
                 if(mark) {
-                    if (x > 0)
-                        settingStyleButton(ocean[x - 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (x < 9)
-                        settingStyleButton(ocean[x + 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                    if (x > 0) {
+                        settingStyleButton(ocean[x - 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if (disable)
+                            ocean[x - 1][ty].setOnAction(null);
+                    }
+                    if (x < 9) {
+                        settingStyleButton(ocean[x + 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[x + 1][ty].setOnAction(null);
+                    }
                 }
                 ty--;
             } else {
                 if(mark) {
-                    settingStyleButton(ocean[x][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (x > 0)
-                        settingStyleButton(ocean[x - 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (x < 9)
-                        settingStyleButton(ocean[x + 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                    settingStyleButton(ocean[x][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                    if(disable)
+                        ocean[x][ty].setOnAction(null);
+                    if (x > 0) {
+                        settingStyleButton(ocean[x - 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[x - 1][ty].setOnAction(null);
+                    }
+                    if (x < 9){
+                        settingStyleButton(ocean[x + 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[x + 1][ty].setOnAction(null);
+                    }
                 }
                 break;
             }
@@ -401,31 +496,49 @@ public class BattleScene {
         ty = y + 1;
         while(ty <= 9)
             if(ocean[x][ty].getStyle().equals(Styles.getFireShipStyle()) || ocean[x][ty].getStyle().equals(Styles.getExtractedFireShipStyle())){
-                settingStyleButton(ocean[x][ty], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle());
+                settingStyleButton(ocean[x][ty], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle(), isExtractable);
+                if(disable)
+                    ocean[x][ty].setOnAction(null);
                 if(mark) {
-                    if (x > 0)
-                        settingStyleButton(ocean[x - 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (x < 9)
-                        settingStyleButton(ocean[x + 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                    if (x > 0) {
+                        settingStyleButton(ocean[x - 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[x - 1][ty].setOnAction(null);
+                    }
+                    if (x < 9){
+                        settingStyleButton(ocean[x + 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[x + 1][ty].setOnAction(null);
+                    }
                 }
                 ty++;
             } else {
                 if(mark) {
-                    settingStyleButton(ocean[x][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (x > 0)
-                        settingStyleButton(ocean[x - 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
-                    if (x < 9)
-                        settingStyleButton(ocean[x + 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle());
+                    settingStyleButton(ocean[x][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                    if(disable)
+                        ocean[x][ty].setOnAction(null);
+                    if (x > 0) {
+                        settingStyleButton(ocean[x - 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[x - 1][ty].setOnAction(null);
+                    }
+                    if (x < 9){
+                        settingStyleButton(ocean[x + 1][ty], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), isExtractable);
+                        if(disable)
+                            ocean[x + 1][ty].setOnAction(null);
+                    }
                 }
                 break;
             }
 
     }
 
-    static void settingStyleButton(Button square, String usualStyle, String aimStyle){
+    static void settingStyleButton(Button square, String usualStyle, String aimStyle, boolean isExtractable){
         square.setStyle(usualStyle);
+        if(isExtractable){
         square.setOnMouseEntered(event -> square.setStyle(aimStyle));
         square.setOnMouseExited(event -> square.setStyle(usualStyle));
+        }
     }
 
     static void makeSeaClear(Button btn) {

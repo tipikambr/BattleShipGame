@@ -127,7 +127,6 @@ public class PlanOfShips {
             updateRemainedNumOfShip(i);
         //Part about chat
         if (chatTable == null) {
-            System.out.println("bgidfsl  " + param + ";");
             chatTable = (GridPane) root.lookup("#chatTable");
             chatScrollPane = (ScrollPane) root.lookup("#chatScrollPane");
             chatScrollPane.focusedProperty().addListener((e, oldVal, newVal) -> {
