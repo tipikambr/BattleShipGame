@@ -32,7 +32,7 @@ public abstract class Connection implements Runnable {
         String sender = "P";        //Battle or Plan
         final ConcurrentLinkedDeque<String> listMessages = new ConcurrentLinkedDeque<String>();
 
-        getMessagesinThread(listMessages, null, null);
+        getMessagesInThread(listMessages, null, null);
 
         LocalTime end = LocalTime.now().plusSeconds(BattleshipGame.getTimeWait() / 2);
         LocalTime timeOut = LocalTime.now().plusSeconds(BattleshipGame.getTimeOut());
@@ -103,7 +103,7 @@ public abstract class Connection implements Runnable {
                             continue;
                         int x = Integer.parseInt(shoot[1]);
                         int y = Integer.parseInt(shoot[2]);
-                        Launcher.send(" " + BattleScene.getShoot(x, y) + " " + x + " " + y, 'R');
+                        Platform.runLater(() -> Launcher.send(" " + BattleScene.getShoot(x, y) + " " + x + " " + y, 'R'));
                         break;
 
                         //Message with result of shoot
@@ -159,10 +159,6 @@ public abstract class Connection implements Runnable {
                             return;
                         }
                         if(message.length() == 2 && message.charAt(1) == 'A'){
-//                            Platform.runLater(() -> {
-//                                PlanOfShips.writeMessage("Системное: вы отключились от игры.");
-//                                PlanOfShips.lostConnection();
-//                            });
                             stop();
                             return;
                         }
@@ -205,22 +201,23 @@ public abstract class Connection implements Runnable {
                         else if (finalSender1 == "B")
                             BattleScene.writeMessage("Системное: Потеря соединения. Попытка восстановления");
                     });
+                    end = timeOut;
+                    continue;
                 }
 
-                if(timeOut.isBefore(LocalTime.now())) {
-                    String finalSender2 = sender;
-                    Platform.runLater(() -> {
-                        if(finalSender2 == "B")
-                            BattleScene.writeMessage("Системное: Восстановить связь не удалось.");
 
-                        BattleshipGame.beginPlanBattlePlace("S");
-                        PlanOfShips.writeMessage("Системное: Восстановить связь не удалось.");
-                        PlanOfShips.lostConnection();
-                    });
-                    running = false;
-                    stop();
-                    return;
-                }
+                String finalSender2 = sender;
+                Platform.runLater(() -> {
+                    if(finalSender2 == "B")
+                        BattleScene.writeMessage("Системное: Восстановить связь не удалось.");
+
+                    BattleshipGame.beginPlanBattlePlace("S");
+                    PlanOfShips.writeMessage("Системное: Восстановить связь не удалось.");
+                    PlanOfShips.lostConnection();
+                });
+                running = false;
+                stop();
+                return;
             }
         }
     }
@@ -236,7 +233,7 @@ public abstract class Connection implements Runnable {
         return false;
     }
 
-    void getMessagesinThread(ConcurrentLinkedDeque<String> listMessages, LocalTime timeWork, Integer numOfMessages) {
+    void getMessagesInThread(ConcurrentLinkedDeque<String> listMessages, LocalTime timeWork, Integer numOfMessages) {
         Thread reader = new Thread(() -> {
             int readed = 0;
             while((running && (numOfMessages == null || readed < numOfMessages) && (timeWork == null || timeWork.isAfter(LocalTime.now()))))
@@ -247,9 +244,9 @@ public abstract class Connection implements Runnable {
                         if (listMessages.getFirst().charAt(0)=='Q')
                             return;
 
-                    }
+                    } else Thread.sleep(100);
                 } catch (Exception e){
-                    return;//DNZOBDFSHIOGJIODFS;JHIDFSJ;VDFSJIULBHSFJDFS;OIGJIOEWJTHOWTRS
+                    return;
                 }
         });
         reader.setDaemon(true);

@@ -41,7 +41,7 @@ public class Launcher {
     }
 
     public static String getName(){
-        return runnablePart.myname;
+        return runnablePart.opponentName;
     }
 
     public static void stop(){

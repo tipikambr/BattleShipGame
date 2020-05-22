@@ -59,12 +59,13 @@ public class Server extends Connection{
     private boolean getConnection(){
         try {
             client = server.accept();
+            client.setSoTimeout(BattleshipGame.getTimeOut() * 1000);
 
             out = new PrintWriter(client.getOutputStream(), true, Charset.forName("windows-1251"));
             in = new Scanner(client.getInputStream(), "windows-1251");
 
             final ConcurrentLinkedDeque<String> listMessages = new ConcurrentLinkedDeque<String>();
-            getMessagesinThread(listMessages, LocalTime.now().plusSeconds(BattleshipGame.getTimeOut()), 1);
+            getMessagesInThread(listMessages, LocalTime.now().plusSeconds(BattleshipGame.getTimeOut()), 1);
 
             while(listMessages.size() == 0)
                 if(!running) return false;

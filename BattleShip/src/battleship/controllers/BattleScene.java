@@ -108,6 +108,7 @@ public class BattleScene {
         if(infoGrid == null) {
             infoGrid = (GridPane) root.lookup("#infoGrid");
             textScrollPaneLog = (ScrollPane) root.lookup("#textScrollPaneLog");
+            textScrollPaneLog.setFitToWidth(true);
             installInfoUI();
         }
         Launcher.send("",'S');
@@ -161,6 +162,9 @@ public class BattleScene {
         textChat = new Label(PlanOfShips.getChatLabel().getText());
         textChat.setPrefWidth(10000);
         textChat.setWrapText(true);
+        textChat.heightProperty().addListener(observable -> {
+            chatScrollPane.setVvalue(1.0);
+        });
         chatScrollPane.setContent(textChat);
 
         sendMessage = new Button("Отправить");
@@ -213,6 +217,9 @@ public class BattleScene {
         textlog = new Label();
         textlog.setPrefWidth(10000);
         textlog.setWrapText(true);
+        textlog.heightProperty().addListener(observable -> {
+            textScrollPaneLog.setVvalue(1.0);
+        });
         textScrollPaneLog.setContent(textlog);
 
         infoGrid.add(textInfo,0,1);
@@ -262,6 +269,18 @@ public class BattleScene {
 
     static public int getShoot(int x, int y){
         int type = BattleshipGame.getMyOcean().shootAt(x, y);
+        textlog.setText(textlog.getText() + " выстрелил по координатам (" + x + ";" + y + ")\n");
+        switch (type){
+            case -1:
+                textlog.setText(textlog.getText() + Messages.ShootInSeaMessages() + "\n\nВы: ");
+                break;
+            case 1:
+                textlog.setText(textlog.getText() + Messages.DestroyShipMessage() + "\n\n" + Launcher.getName() + ": ");
+                break;
+            case 2:
+                textlog.setText(textlog.getText() + Messages.ShootInShipMessages() + "\n\n" + Launcher.getName() + ": ");
+                break;
+        }
         makeMySeaSquareTruth(myOceanButtons[x][y], BattleshipGame.getMyOcean(), x, y);
         Launcher.send("GET", 'I');
         if(type != 1 && type != 2){
@@ -293,9 +312,6 @@ public class BattleScene {
 
     static public void writeMessage(String message){
         textChat.setText(textChat.getText() + message + "\n" );
-        textChat.heightProperty().addListener(observable -> {
-            chatScrollPane.setVvalue(1.0);
-        });
     }
 
     //
@@ -337,7 +353,7 @@ public class BattleScene {
                 missShoot.seek(new Duration(0));
                 missShoot.play();
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), true);
-                textlog.setText(textlog.getText() + Messages.ShootInSeaMessages() + "\n" + Launcher.getName() + ":");
+                textlog.setText(textlog.getText() + Messages.ShootInSeaMessages() + "\n\n" + Launcher.getName() + ": ");
                 break;
             case 0:
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getNotShootedSeaStyle(), Styles.getExtractedNotShootedSeaStyle(), true);
@@ -345,7 +361,7 @@ public class BattleScene {
             case 1:
                 aimShoot.seek(new Duration(0));
                 aimShoot.play();
-                textlog.setText(textlog.getText() + Messages.DestroyShipMessage() + "\nВы: ");
+                textlog.setText(textlog.getText() + Messages.DestroyShipMessage() + "\n\nВы: ");
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle(), true);
                 sunkShip(opponentOceanButtons, x,y, true, true, true);
                 isMyTurn = true;
@@ -353,7 +369,7 @@ public class BattleScene {
             case 2:
                 aimShoot.seek(new Duration(0));
                 aimShoot.play();
-                textlog.setText(textlog.getText() + Messages.ShootInShipMessages() + "\nВы: ");
+                textlog.setText(textlog.getText() + Messages.ShootInShipMessages() + "\n\nВы: ");
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getFireShipStyle(), Styles.getExtractedFireShipStyle(), true);
                 shootedInFireShip(opponentOceanButtons, x,y, true);
                 isMyTurn = true;
