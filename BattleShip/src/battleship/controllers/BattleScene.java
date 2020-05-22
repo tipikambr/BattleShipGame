@@ -19,10 +19,8 @@ import javafx.util.Duration;
 import java.util.Optional;
 
 public class BattleScene {
-    final static String shootSoundPath = BattleScene.class.getResource("/battleship/resources/sounds/shoot.mp3").toString();
     final static String missSoundPath = BattleScene.class.getResource("/battleship/resources/sounds/miss.mp3").toString();
     final static String aimSoundPath = BattleScene.class.getResource("/battleship/resources/sounds/boom.mp3").toString();
-    static MediaPlayer shootPlayer;
     static MediaPlayer missShoot;
     static MediaPlayer aimShoot;
 
@@ -77,10 +75,7 @@ public class BattleScene {
         }
         installField(myOceanButtons, myOcean, true);
 
-        if(shootPlayer == null){
-            shootPlayer = new MediaPlayer(new Media(shootSoundPath));
-            shootPlayer.setVolume(0.5);
-            shootPlayer.setRate(2.0);
+        if(missShoot == null){
             missShoot = new MediaPlayer(new Media(missSoundPath));
             missShoot.setVolume(0.1);
             missShoot.setRate(2.0);
@@ -117,6 +112,8 @@ public class BattleScene {
         }
         Launcher.send("",'S');
         Launcher.send("GET", 'I');
+        writeMessage("Системное: " + (isMyTurn ? "Вам досталась честь ходить первым!" : "Первый ход за " + Launcher.getName()));
+        textlog.setText(isMyTurn ? "Вы: " : Launcher.getName() + ": ");
     }
 
     static void installField(Button[][] buttons, GridPane battlePlace, boolean isFriendly) {
@@ -257,9 +254,7 @@ public class BattleScene {
             return;
         }
         opponentOceanButtons[x][y].setOnAction(null);
-
-        shootPlayer.seek(new Duration(0));
-        shootPlayer.play();
+        textlog.setText(textlog.getText() + " выстрелили по координатам (" + x + ";" + y +")\n");
         Launcher.send(" " + x + " " + y, 'A');
         Launcher.send("GET", 'I');
         isMyTurn = false;
@@ -278,9 +273,11 @@ public class BattleScene {
             aimShoot.seek(new Duration(0.0));
             aimShoot.play();
         }
-        if(BattleshipGame.getMyOcean().isGameOver())
+        if(BattleshipGame.getMyOcean().isGameOver()) {
+            BattleshipGame.beginPlanBattlePlace("S");
+            PlanOfShips.getConnection();
             Launcher.send("SF " + BattleshipGame.convertStatistic(), 'D');
-
+        }
         return type;
     }
 
@@ -336,17 +333,27 @@ public class BattleScene {
         switch (res){
             case -2:
             case -1:
+
+                missShoot.seek(new Duration(0));
+                missShoot.play();
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), true);
+                textlog.setText(textlog.getText() + Messages.ShootInSeaMessages() + "\n" + Launcher.getName() + ":");
                 break;
             case 0:
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getNotShootedSeaStyle(), Styles.getExtractedNotShootedSeaStyle(), true);
                 break;
             case 1:
+                aimShoot.seek(new Duration(0));
+                aimShoot.play();
+                textlog.setText(textlog.getText() + Messages.DestroyShipMessage() + "\nВы: ");
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getSunkedShipStyle(), Styles.getExtractedSunkedShipStyle(), true);
                 sunkShip(opponentOceanButtons, x,y, true, true, true);
                 isMyTurn = true;
                 break;
             case 2:
+                aimShoot.seek(new Duration(0));
+                aimShoot.play();
+                textlog.setText(textlog.getText() + Messages.ShootInShipMessages() + "\nВы: ");
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getFireShipStyle(), Styles.getExtractedFireShipStyle(), true);
                 shootedInFireShip(opponentOceanButtons, x,y, true);
                 isMyTurn = true;

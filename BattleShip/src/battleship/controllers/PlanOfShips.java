@@ -24,6 +24,7 @@ public class PlanOfShips {
     static int choosenLen;
     static boolean vertival;
     static boolean isAdd;
+    static boolean lookingForOpponent;
     static Ship addingShip;
     static Font globalFont;
     static int[] remainedNumShips;
@@ -40,6 +41,7 @@ public class PlanOfShips {
     static Button removeShipButton;
     static Button rotateShipButton;
     static Button removeAllShipsButton;
+    static Button placeShipsRandomlyButton;
 
     @FXML
     static GridPane battlePlace;
@@ -76,6 +78,7 @@ public class PlanOfShips {
      * This method should be used for initializing the planning scene
      */
     public static void init(String param){
+        lookingForOpponent = false;
         choosenLen = 4;
         isAdd = true;
         vertival = false;
@@ -136,9 +139,10 @@ public class PlanOfShips {
             messageTable = (GridPane) root.lookup("#messageTable");
             initialChatTableUI();
         }
-        if(param != null && param.matches("S")){
+        if(param != null && param.matches("S") && BattleScene.getChatLabel() != null){
             chatText.setText(BattleScene.getChatLabel().getText());
-        }
+        } else
+            chatText.setText("");
 
 
         messageText.setText("");
@@ -153,7 +157,6 @@ public class PlanOfShips {
 
 
     }
-
 
     static void initialChatTableUI() {
         chatText = new Label();
@@ -242,6 +245,8 @@ public class PlanOfShips {
                 rightMenu[choosenLen - 1].setStyle(Styles.getPaneBordersStyle());
             }
             installNewShip();
+            if(BattleshipGame.getMyOcean().isReady())
+                startButton.setDisable(false);
         }
     }
 
@@ -266,6 +271,7 @@ public class PlanOfShips {
         remainedNumShips[length - 1]++;
         updateRemainedNumOfShip(length - 1);
         buttons[x][y].setStyle(Styles.getExtractedNotShootedSeaStyle());
+        startButton.setDisable(true);
     }
 
     /**
@@ -320,6 +326,7 @@ public class PlanOfShips {
      * Delete all ships from sea
      */
     static void clearSea() {
+        startButton.setDisable(true);
         BattleshipGame.getMyOcean().deleteAllShips();
         makeAllSeaClear();
         for(int i = 0; i < 4; i++) {
@@ -447,6 +454,7 @@ public class PlanOfShips {
         startButton.setFont(globalFont);
         startButton.setPrefWidth(10000);
         startButton.setPrefHeight(10000);
+        startButton.setDisable(true);
         startButton.setOnAction(e -> confirmSolo());
 
         hostButton = new Button("Ожидать противника!");
@@ -507,16 +515,18 @@ public class PlanOfShips {
     }
 
     static void confirmStop(){
+        lookingForOpponent = false;
         clickedStop();
         Launcher.stop();
     }
 
     static void confirmDisconnect(){
+        lookingForOpponent = false;
         Launcher.send("S",'Q');
-        PlanOfShips.writeMessage("Системное: вы отключились от игры.");
     }
 
     static public void clickedStartHost(){
+        lookingForOpponent = true;
         startButton.setDisable(true);
 
         cancelButton.setDisable(true);
@@ -534,6 +544,7 @@ public class PlanOfShips {
     }
 
     static public void clickedStartConnect(){
+        lookingForOpponent = true;
         startButton.setDisable(true);
 
         cancelButton.setDisable(true);
@@ -551,7 +562,11 @@ public class PlanOfShips {
     }
 
     static public void clickedStop(){
-        startButton.setDisable(false);
+        lookingForOpponent = false;
+        if(BattleshipGame.getMyOcean().isReady())
+            startButton.setDisable(false);
+        else
+            startButton.setDisable(true);
 
         cancelButton.setDisable(false);
 
@@ -571,9 +586,13 @@ public class PlanOfShips {
     }
 
     static public void getConnection(){
+        lookingForOpponent = false;
         startButton.setText("Онлайн сражение!");
         startButton.setOnAction(e -> confirmMultiple());
-        startButton.setDisable(false);
+        if(BattleshipGame.getMyOcean().isReady())
+            startButton.setDisable(false);
+        else
+            startButton.setDisable(true);
 
         cancelButton.setText("Отключиться");
         cancelButton.setOnAction(e -> confirmDisconnect());
@@ -589,9 +608,13 @@ public class PlanOfShips {
     }
 
     static public void lostConnection() {
+        lookingForOpponent = false;
         startButton.setText("Оффлайн сражение!");
         startButton.setOnAction(e -> confirmSolo());
-        startButton.setDisable(false);
+        if(BattleshipGame.getMyOcean().isReady())
+            startButton.setDisable(false);
+        else
+            startButton.setDisable(true);
 
         cancelButton.setText("Вернуться в меню");
         cancelButton.setOnAction(e -> confirmCancel());
@@ -644,9 +667,31 @@ public class PlanOfShips {
         removeAllShipsButton.setFont(globalFont);
         removeAllShipsButton.setOnAction(e -> clearSea());
 
+        placeShipsRandomlyButton = new Button("Расставить корабли случайно");
+        placeShipsRandomlyButton.setPrefWidth(10000);
+        placeShipsRandomlyButton.setPrefHeight(10000);
+        placeShipsRandomlyButton.setFont(globalFont);
+        placeShipsRandomlyButton.setOnAction(e -> placeAllShipsRandomply());
+
         controlShipsButtonPlace.add(removeShipButton, 0,0);
         controlShipsButtonPlace.add(rotateShipButton, 0, 2);
         controlShipsButtonPlace.add(removeAllShipsButton,0, 4);
+        controlShipsButtonPlace.add(placeShipsRandomlyButton,0,6);
+    }
+
+    static void placeAllShipsRandomply(){
+        BattleshipGame.getMyOcean().placeAllShipsRandomly();
+        makeAllSeaClear();
+        for(int i = 0; i < 10; i++)
+            for(int j = 0; j < 10; j++)
+                if(BattleshipGame.getMyOcean().whatIsHere(i,j) == 3)
+                   buttons[i][j].setStyle(Styles.getMyShipStyle());
+        for(int i = 0; i < 4; i++){
+            remainedNumShips[i] = 0;
+            updateRemainedNumOfShip(i);
+        }
+        if(!lookingForOpponent)
+            startButton.setDisable(false);
     }
 
     /**

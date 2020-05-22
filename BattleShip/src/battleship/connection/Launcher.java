@@ -38,7 +38,12 @@ public class Launcher {
         runnablePart.sendMessage(type + message);
     }
 
+    public static String getName(){
+        return runnablePart.name;
+    }
+
     public static void stop(){
+        runnablePart.running = false;
         runnablePart.stop();
     }
 }

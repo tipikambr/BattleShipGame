@@ -100,9 +100,9 @@ public class Server extends Connection{
     public void stop() {
         try {
             running = false;
-//            if(in != null) in.close();
-//            if (out != null) out.close();
-//            if (client != null) client.close();
+            if(in != null) in.close();
+            if (out != null) out.close();
+            if (client != null) client.close();
             if (server != null) server.close();
         } catch (IOException e) {
             e.printStackTrace();

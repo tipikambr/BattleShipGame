@@ -123,14 +123,16 @@ public class Messages {
                 "Все вражеские корабли просто исчезли!");
     }
 
-    public static String SalagaAttentionMessages() {return salagaAttentionMessages.get(rand.nextInt(salagaAttentionMessages.size()));}
-    public static String DisunderstandingAimMessages() {return disunderstandingAimMessages.get(rand.nextInt(disunderstandingAimMessages.size()));}
+
+    public static String ShootInSeaMessages() {return shootInSeaMessages.get(rand.nextInt(shootInSeaMessages.size()));}
+    public static String DestroyShipMessage() {return destroyShipMessage.get(rand.nextInt(destroyShipMessage.size()));}
+    public static String ShootInShipMessages() {return shootInShipMessages.get(rand.nextInt(shootInShipMessages.size()));}
+
     public static String ShootInFireShipMessages() {return shootInFireShipMessages.get(rand.nextInt(shootInFireShipMessages.size()));}
     public static String ShootInSunkShipMessages() {return shootInSunkShipMessages.get(rand.nextInt(shootInSunkShipMessages.size()));}
+    public static String SalagaAttentionMessages() {return salagaAttentionMessages.get(rand.nextInt(salagaAttentionMessages.size()));}
+    public static String DisunderstandingAimMessages() {return disunderstandingAimMessages.get(rand.nextInt(disunderstandingAimMessages.size()));}
     public static String ShootNotFirstTimeInSeaMessages() {return shootNotFirstTimeInSeaMessages.get(rand.nextInt(shootNotFirstTimeInSeaMessages.size()));}
-    public static String ShootInSeaMessages() {return shootInSeaMessages.get(rand.nextInt(shootInSeaMessages.size()));}
-    public static String ShootInShipMessages() {return shootInShipMessages.get(rand.nextInt(shootInShipMessages.size()));}
-    public static String DestroyShipMessage() {return destroyShipMessage.get(rand.nextInt(destroyShipMessage.size()));}
     public static String UnderstandMessage() {return understandMessage.get(rand.nextInt(understandMessage.size()));}
     public static String NotNyTurnMessages() { return notNyTurnMessages.get(rand.nextInt(notNyTurnMessages.size()));}
     public static String NotTimeYetMessages() { return notTimeYetMessage.get(rand.nextInt(notTimeYetMessage.size()));}

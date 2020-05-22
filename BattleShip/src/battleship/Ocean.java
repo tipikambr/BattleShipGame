@@ -85,6 +85,16 @@ public class Ocean {
 
     //Methods
 
+    public boolean isReady(){
+        int num = 0;
+        for(int i = 0; i < 10; i++)
+            for(int j = 0; j < 10; j++)
+                if(!ships[i][j].getShipType().equals("EmptySea"))
+                    num++;
+        return num == 20;
+    }
+
+
     /**
      * Randomly place
      *      1 Battleship,

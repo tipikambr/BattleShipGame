@@ -75,7 +75,7 @@ public abstract class Connection implements Runnable {
                     case 'S': //Start (game)
                         if(message.equals("SG")) {
                             BattleScene.opponentReady();
-                            Launcher.send("O",'S');
+                            Launcher.send("O"  ,'S');
                         }
                         if(message.equals("SO"))
                             sender = "B";
@@ -111,7 +111,9 @@ public abstract class Connection implements Runnable {
                         int type = Integer.parseInt(res[1]);
                         x = Integer.parseInt(res[2]);
                         y = Integer.parseInt(res[3]);
-                        BattleScene.makeInRealMyShoot(type, x, y);
+                        Platform.runLater(() -> {
+                            BattleScene.makeInRealMyShoot(type, x, y);
+                        });
                         break;
 
                         //When game over
@@ -127,7 +129,11 @@ public abstract class Connection implements Runnable {
                             Launcher.send("O " + BattleshipGame.convertStatistic(), 'D');
                             int[] numbers = new int[5];
                             if (convertStringStatisticToArrayIntStatistic(message, numbers)) break;
-                            Platform.runLater(() -> BattleScene.winMessage(numbers, message.charAt(2)));
+                            Platform.runLater(() -> {
+                                BattleScene.winMessage(numbers, message.charAt(2));
+                                BattleshipGame.beginPlanBattlePlace("S");
+                                PlanOfShips.getConnection();
+                            });
                         } else
                         if(message.charAt(1) == 'O'){
                             int[] numbers = new int[5];
@@ -143,6 +149,7 @@ public abstract class Connection implements Runnable {
                         // A - choosing the ship, opponent can quit
                         //ELSE - ERROR
                     case 'Q':   //QUIT
+                        running = false;
                         if(message.length() == 2 && message.charAt(1) == 'S'){
                             Launcher.send("A", 'Q');
                             Platform.runLater(() -> PlanOfShips.writeMessage("Системное: Противник вышел из игры."));
@@ -151,7 +158,10 @@ public abstract class Connection implements Runnable {
                             return;
                         }
                         if(message.length() == 2 && message.charAt(1) == 'A'){
-                            Platform.runLater(PlanOfShips::lostConnection);
+                            Platform.runLater(() -> {
+                                PlanOfShips.writeMessage("Системное: вы отключились от игры.");
+                                PlanOfShips.lostConnection();
+                            });
                             stop();
                             return;
                         }
@@ -166,7 +176,12 @@ public abstract class Connection implements Runnable {
                     case 'O':   //OK
                         break;
                 }
-            }
+            } else
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
             if(end.isBefore(LocalTime.now())){
                 if(hungry == 0) {
@@ -189,11 +204,11 @@ public abstract class Connection implements Runnable {
                 if(timeOut.isBefore(LocalTime.now())) {
                     String finalSender2 = sender;
                     Platform.runLater(() -> {
-                        if(finalSender2 == "P")
-                            PlanOfShips.writeMessage("Системное: Восстановить связь не удалось.");
-                        else
+                        if(finalSender2 == "B")
                             BattleScene.writeMessage("Системное: Восстановить связь не удалось.");
+
                         BattleshipGame.beginPlanBattlePlace("S");
+                        PlanOfShips.writeMessage("Системное: Восстановить связь не удалось.");
                         PlanOfShips.lostConnection();
                     });
                     Launcher.stop();
@@ -217,14 +232,17 @@ public abstract class Connection implements Runnable {
     void getMessagesinThread(ConcurrentLinkedDeque<String> listMessages, LocalTime timeWork, Integer numOfMessages) {
         Thread reader = new Thread(() -> {
             int readed = 0;
-            while((numOfMessages == null || readed < numOfMessages) && (timeWork == null || timeWork.isAfter(LocalTime.now())))
+            while((running && (numOfMessages == null || readed < numOfMessages) && (timeWork == null || timeWork.isAfter(LocalTime.now()))))
                 try{
                     if(in.hasNext()) {
                         listMessages.add(in.nextLine());
                         readed++;
+                        if (listMessages.getFirst().charAt(0)=='Q')
+                            return;
+
                     }
                 } catch (Exception e){
-                    return;
+                    return;//DNZOBDFSHIOGJIODFS;JHIDFSJ;VDFSJIULBHSFJDFS;OIGJIOEWJTHOWTRS
                 }
         });
         reader.setDaemon(true);
