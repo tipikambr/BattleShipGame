@@ -15,14 +15,14 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class Client extends Connection {
     User user;
 
-    public Client(User user, String  name) {
+    public Client(User user, String  myname) {
         this.user = new User();
         this.user.port = user.port;
         this.user.ip = user.ip;
         this.user.name = user.name;
 
         running = false;
-        this.name = name;
+        this.myname = myname;
     }
 
     @Override
@@ -52,22 +52,24 @@ public class Client extends Connection {
             } catch (IOException e) {
             }
 
-        Launcher.send(name, 'N');
+        Launcher.send(myname, 'N');
         final ConcurrentLinkedDeque<String> listMessages = new ConcurrentLinkedDeque<String>();
         getMessagesinThread(listMessages, LocalTime.now().plusSeconds(BattleshipGame.getTimeOut()), 1);
 
         while(listMessages.size() == 0)
             if(!running) return false;
 
-        if(listMessages.remove().charAt(0) != 'Y'){
+        opponentName = listMessages.remove();
+        if(opponentName.charAt(0) != 'Y'){
             Platform.runLater(() -> {
                 PlanOfShips.writeMessage("Системное: Сервер пытается восстановить связь, но не с вами.");
             });
             return false;
         }
 
+        opponentName = opponentName.substring(1);
         Platform.runLater(() -> {
-            PlanOfShips.writeMessage("Системное: Вы подключены к игре.");
+            PlanOfShips.writeMessage("Системное: Вы подключены к игре. Противник называет себя: " + opponentName);
         });
         return true;
     }

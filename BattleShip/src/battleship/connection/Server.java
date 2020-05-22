@@ -19,8 +19,9 @@ public class Server extends Connection{
     private ServerSocket server;
     Port port;
 
-    public Server(Port port){
+    public Server(Port port, String myname){
         this.port = port;
+        this.myname = myname;
     }
 
     @Override
@@ -68,8 +69,8 @@ public class Server extends Connection{
             while(listMessages.size() == 0)
                 if(!running) return false;
 
-            name = listMessages.remove();
-            if(name.charAt(0) != 'N')
+            opponentName = listMessages.remove();
+            if(opponentName.charAt(0) != 'N')
             {
                 Platform.runLater(() -> {
                     PlanOfShips.writeMessage("Системное: Что-то пошло не так");
@@ -77,12 +78,12 @@ public class Server extends Connection{
                 return false;
             }
 
-            name = name.substring(1);
+            opponentName = opponentName.substring(1);
 
-            out.println("Y");
+            out.println("Y" + myname);
 
             Platform.runLater(() -> {
-                PlanOfShips.writeMessage("Системное: Соединение установлено. Ваш противник " + name);
+                PlanOfShips.writeMessage("Системное: Соединение установлено. Ваш противник " + opponentName);
             });
             return true;
         } catch (IOException e) {

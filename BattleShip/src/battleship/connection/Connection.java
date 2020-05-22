@@ -19,7 +19,8 @@ public abstract class Connection implements Runnable {
     protected Scanner in;
     protected boolean running;
 
-    String name;
+    String myname;
+    String opponentName;
 
     public void sendMessage(String message) {
         out.println(message);
@@ -170,7 +171,7 @@ public abstract class Connection implements Runnable {
                         return;
                         //Test connection message
                     case 'T':   //TEST
-                        Launcher.sendMessage("", 'O');
+                        Launcher.send("", 'O');
                         break;
                         //Answer on test message
                     case 'O':   //OK
@@ -191,7 +192,7 @@ public abstract class Connection implements Runnable {
             if(end.isBefore(LocalTime.now())){
                 if(hungry == 0) {
                     hungry = 1;
-                    Launcher.sendMessage("",'T');
+                    Launcher.send("",'T');
                     end = LocalTime.now().plusSeconds(BattleshipGame.getTimeWait());
                     continue;
                 }

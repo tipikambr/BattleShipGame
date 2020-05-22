@@ -86,7 +86,7 @@ public class ServerDialogSimple {
     private static void host() {
         port = portComboBox.getValue();
         BattleshipGame.updateINIFile(port, null, null);
-        Launcher.create(new Server(port), 's');
+        Launcher.create(new Server(port, "Я великий сервер"), 's');             //TODO choose your name
         PlanOfShips.clickedStartHost();
         BattleshipGame.closeSimpleHostDialog();
     }

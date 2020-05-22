@@ -33,7 +33,7 @@ public class Launcher {
     public static void sendMessage(String message, char type){
         if(message.equals("QS"))
             runnablePart.running = false;
-        runnablePart.sendMessage(type + runnablePart.name + ": " + message);
+        runnablePart.sendMessage(type + runnablePart.myname + ": " + message);
     }
 
     public static void send(String message, char type){
@@ -41,7 +41,7 @@ public class Launcher {
     }
 
     public static String getName(){
-        return runnablePart.name;
+        return runnablePart.myname;
     }
 
     public static void stop(){
