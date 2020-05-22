@@ -522,7 +522,10 @@ public class PlanOfShips {
 
     static void confirmDisconnect(){
         lookingForOpponent = false;
+        writeMessage("Системное: вы отключились от игры.");
+        lostConnection();
         Launcher.send("S",'Q');
+        Launcher.stop();
     }
 
     static public void clickedStartHost(){

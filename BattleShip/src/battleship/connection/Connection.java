@@ -158,10 +158,10 @@ public abstract class Connection implements Runnable {
                             return;
                         }
                         if(message.length() == 2 && message.charAt(1) == 'A'){
-                            Platform.runLater(() -> {
-                                PlanOfShips.writeMessage("Системное: вы отключились от игры.");
-                                PlanOfShips.lostConnection();
-                            });
+//                            Platform.runLater(() -> {
+//                                PlanOfShips.writeMessage("Системное: вы отключились от игры.");
+//                                PlanOfShips.lostConnection();
+//                            });
                             stop();
                             return;
                         }
@@ -182,6 +182,11 @@ public abstract class Connection implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+            if(!running){
+                stop();
+                return;
+            }
 
             if(end.isBefore(LocalTime.now())){
                 if(hungry == 0) {
@@ -211,7 +216,8 @@ public abstract class Connection implements Runnable {
                         PlanOfShips.writeMessage("Системное: Восстановить связь не удалось.");
                         PlanOfShips.lostConnection();
                     });
-                    Launcher.stop();
+                    running = false;
+                    stop();
                     return;
                 }
             }

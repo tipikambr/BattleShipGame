@@ -31,6 +31,8 @@ public class Launcher {
     }
 
     public static void sendMessage(String message, char type){
+        if(message.equals("QS"))
+            runnablePart.running = false;
         runnablePart.sendMessage(type + runnablePart.name + ": " + message);
     }
 
