@@ -91,10 +91,10 @@ public class BattleshipGame extends Application {
 
 
         connectSimpleDialog = new Stage();
-        connectSimpleDialog.setMinWidth(400);
-        connectSimpleDialog.setMinHeight(200);
-        connectSimpleDialog.setMaxWidth(400);
-        connectSimpleDialog.setMaxHeight(200);
+//        connectSimpleDialog.setMinWidth(400);
+//        connectSimpleDialog.setMinHeight(200);
+//        connectSimpleDialog.setMaxWidth(400);
+//        connectSimpleDialog.setMaxHeight(200);
 
         connectSimpleRoot = FXMLLoader.load(getClass().getResource(connectSimpleDialogURL));
 
@@ -105,10 +105,6 @@ public class BattleshipGame extends Application {
         connectSimpleDialog.setScene(new Scene(connectSimpleRoot));
 
         hostSimpleDialog = new Stage();
-        hostSimpleDialog.setMinWidth(400);
-        hostSimpleDialog.setMinHeight(200);
-        hostSimpleDialog.setMaxWidth(400);
-        hostSimpleDialog.setMaxHeight(200);
 
         hostSimpleRoot = FXMLLoader.load(getClass().getResource(hostSimpleDialogURL));
 
@@ -185,6 +181,7 @@ public class BattleshipGame extends Application {
         PrintWriter out = null;
         try{
             File f = new File(connectionStreamInput);
+            boolean isNew = true;
             out = new PrintWriter(f,"windows-1251");
             out.println("#port");
             if(chosenPort != null)
@@ -192,6 +189,9 @@ public class BattleshipGame extends Application {
             for(Port p : ports)
                 if(chosenPort == null || p.port != chosenPort.port)
                     out.println(p.port);
+                else  isNew = false;
+            if(isNew)
+                ports.add(chosenPort);
             out.println("#user");
             if(chosenUser != null)
                 out.println(chosenUser.name+"#"+chosenUser.ip+"#"+chosenUser.port);
@@ -341,6 +341,11 @@ public class BattleshipGame extends Application {
     }
 
     public static void launchSimpleHostDialog(){
+        ServerDialogSimple.init();
+//        hostSimpleDialog.setMinWidth(460);
+//        hostSimpleDialog.setMinHeight(260);
+//        hostSimpleDialog.setMaxWidth(460);
+//        hostSimpleDialog.setMaxHeight(260);
         hostSimpleDialog.show();
     }
 

@@ -57,6 +57,11 @@ public class ClientDialogSimple {
         myName.setFont(new Font(15));
         myName.setText(BattleshipGame.getName());
 
+        myName.textProperty().addListener(((observable, oldValue, newValue) -> {
+            if(newValue.length() > 24)
+                myName.setText(newValue.substring(newValue.length() - 24));
+        }));
+
         nameGrid.add(myName, 1,0);
     }
 
