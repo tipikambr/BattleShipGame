@@ -4,17 +4,23 @@ import battleship.connection.Launcher;
 import battleship.connection.Port;
 import battleship.connection.User;
 import battleship.controllers.*;
+import battleship.controllers.dialogs.ClientDialogSettings;
+import battleship.controllers.dialogs.ClientDialogSimple;
+import battleship.controllers.dialogs.ServerDialogSimple;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.*;
 import java.text.DecimalFormat;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -31,6 +37,7 @@ public class BattleshipGame extends Application {
     final static String trainSceneURL = "/battleship/resources/scenes/trainScene.fxml";
     final static String planSceneURL = "/battleship/resources/scenes/planOfShips.fxml";
     final static String connectSimpleDialogURL = "/battleship/resources/dialogs/client_dialog_simple.fxml";
+    final static String connectSettingsDialogURL = "/battleship/resources/dialogs/client_dialog_settings.fxml";
     final static String hostSimpleDialogURL = "/battleship/resources/dialogs/server_dialog_simple.fxml";
 
     final static String connectionStreamInput = "info.ini";
@@ -51,6 +58,7 @@ public class BattleshipGame extends Application {
     static Parent battleRoot;
 
     static Parent connectSimpleRoot;
+    static Parent connectSettingRoot;
     static Parent hostSimpleRoot;
 
     static Ocean myOcean;
@@ -91,12 +99,14 @@ public class BattleshipGame extends Application {
 
 
         connectSimpleDialog = new Stage();
+        connectSimpleDialog.setResizable(false);
 //        connectSimpleDialog.setMinWidth(400);
 //        connectSimpleDialog.setMinHeight(200);
 //        connectSimpleDialog.setMaxWidth(400);
 //        connectSimpleDialog.setMaxHeight(200);
 
         connectSimpleRoot = FXMLLoader.load(getClass().getResource(connectSimpleDialogURL));
+        connectSettingRoot = FXMLLoader.load(getClass().getResource(connectSettingsDialogURL));
 
         connectSimpleDialog.setTitle("Подключение");
         connectSimpleDialog.initModality(Modality.WINDOW_MODAL);
@@ -105,6 +115,7 @@ public class BattleshipGame extends Application {
         connectSimpleDialog.setScene(new Scene(connectSimpleRoot));
 
         hostSimpleDialog = new Stage();
+        hostSimpleDialog.setResizable(false);
 
         hostSimpleRoot = FXMLLoader.load(getClass().getResource(hostSimpleDialogURL));
 
@@ -122,7 +133,7 @@ public class BattleshipGame extends Application {
         application.show();
     }
 
-    static void readINIFile() throws Exception {
+    static public void readINIFile() throws Exception {
         File f = new File(connectionStreamInput);
         ports = new ArrayList<>();
         users = new ArrayList<>();
@@ -130,9 +141,6 @@ public class BattleshipGame extends Application {
         if(!f.exists()){
             f.createNewFile();
             User defaultUser = new User();
-            defaultUser.port = 7337;
-            defaultUser.name = "localhost";
-            defaultUser.ip = "127.0.0.1";
             timeOut = 120;
             timeWait = 20;
             updateINIFile(null, defaultUser, "Неизвестный игрок");
@@ -154,9 +162,9 @@ public class BattleshipGame extends Application {
         while((text = scanner.nextLine()).charAt(0) != '#') {
             String[] info = text.split("#");
             User next = new User();
-            next.name = info[0];
-            next.ip = info[1];
-            next.port = Integer.parseInt(info[2]);
+            next.setName(info[0]);
+            next.setIp(info[1]);
+            next.setPort(Integer.parseInt(info[2]));
             users.add(next);
         }
         timeOut = Integer.parseInt(scanner.nextLine());
@@ -181,23 +189,20 @@ public class BattleshipGame extends Application {
         PrintWriter out = null;
         try{
             File f = new File(connectionStreamInput);
-            boolean isNew = true;
             out = new PrintWriter(f,"windows-1251");
             out.println("#port");
+
             if(chosenPort != null)
                 out.println(chosenPort.port);
             for(Port p : ports)
                 if(chosenPort == null || p.port != chosenPort.port)
                     out.println(p.port);
-                else  isNew = false;
-            if(isNew)
-                ports.add(chosenPort);
             out.println("#user");
             if(chosenUser != null)
-                out.println(chosenUser.name+"#"+chosenUser.ip+"#"+chosenUser.port);
+                out.println(chosenUser.getName()+"#"+chosenUser.getIp() +"#"+chosenUser.getPort());
             for(User u : users)
-                if(chosenUser == null || (!u.name.equals(chosenUser.name) && !u.ip.equals(chosenUser.ip) && u.port != chosenUser.port))
-                    out.println(u.name+"#"+u.ip+"#"+u.port);
+                if(!u.equals(chosenUser))
+                    out.println(u.getName()+"#"+u.getIp()+"#"+u.getPort());
             out.println("#timeout");
             out.println(timeOut);
             out.println("#timewait");
@@ -288,6 +293,10 @@ public class BattleshipGame extends Application {
         return connectSimpleRoot;
     }
 
+    public static Parent getConnectSettingRoot(){
+        return connectSettingRoot;
+    }
+
     public static Parent getHostSimpleRoot() {
         return hostSimpleRoot;
     }
@@ -327,13 +336,24 @@ public class BattleshipGame extends Application {
      * Setup planning ship position scene
      */
     public static void beginPlanBattlePlace(String param) {
-        myOcean = new Ocean();
+        if(param.length() < 2 || param.charAt(1) != 'P')
+            myOcean = new Ocean();
         PlanOfShips.init(param);
         application.getScene().setRoot(planningRoot);
     }
 
     public static void launchSimpleConnectDialog(){
+        ClientDialogSimple.init();
         connectSimpleDialog.show();
+        if(!connectSimpleDialog.getScene().equals(connectSimpleRoot))
+            connectSimpleDialog.getScene().setRoot(connectSimpleRoot);
+        connectSimpleDialog.sizeToScene();
+    }
+
+    public static void launchSettingsConnectDialog(User user){
+        ClientDialogSettings.init(user);
+        connectSimpleDialog.getScene().setRoot(connectSettingRoot);
+        connectSimpleDialog.sizeToScene();
     }
 
     public static void closeSimpleConnectDialog(){
@@ -342,10 +362,6 @@ public class BattleshipGame extends Application {
 
     public static void launchSimpleHostDialog(){
         ServerDialogSimple.init();
-//        hostSimpleDialog.setMinWidth(460);
-//        hostSimpleDialog.setMinHeight(260);
-//        hostSimpleDialog.setMaxWidth(460);
-//        hostSimpleDialog.setMaxHeight(260);
         hostSimpleDialog.show();
     }
 
@@ -383,5 +399,4 @@ public class BattleshipGame extends Application {
                 "\nСделано ходов: " + opponentOcean.getShotsFired()+
                 "\nПроцент попаданий: " + update.format( 20.0 / (opponentOcean.getShotsFired() + 20.0));
     }
-
 }

@@ -1,9 +1,11 @@
-package battleship.controllers;
+package battleship.controllers.dialogs;
 
 import battleship.BattleshipGame;
 import battleship.connection.Client;
 import battleship.connection.Launcher;
+import battleship.connection.Port;
 import battleship.connection.User;
+import battleship.controllers.PlanOfShips;
 import battleship.ships.Battleship;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,11 +13,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
@@ -29,7 +29,7 @@ public class ClientDialogSimple {
     @FXML
     static GridPane mainGrid;
     static Label textStandart;
-    static ComboBox name;
+    static ComboBox<User> name;
     @FXML
     static GridPane nameGrid;
     static TextField myName;
@@ -41,6 +41,11 @@ public class ClientDialogSimple {
     static Button cancelButton;
 
     public static void init() {
+        try {
+            BattleshipGame.readINIFile();
+        } catch (Exception e) {
+            errorReadINIDileMessage();
+        }
         Parent root = BattleshipGame.getConnectSimpleRoot();
         if(mainGrid == null) {
             mainGrid = (GridPane) root.lookup("#mainGrid");
@@ -50,6 +55,10 @@ public class ClientDialogSimple {
             initialLabel();
             initialUI();
         }
+        ObservableList<User> list = FXCollections.observableArrayList(BattleshipGame.getUsers());
+        name.setItems(list);
+        if(list.size() != 0)
+            name.setValue(list.get(0));
     }
 
     static void initialField(){
@@ -102,6 +111,8 @@ public class ClientDialogSimple {
     }
 
     private static void setting() {
+        BattleshipGame.updateINIFile(null, name.getValue(), myName.getText());
+        BattleshipGame.launchSettingsConnectDialog((User) name.getValue());
     }
 
     private static void connect() {
@@ -137,5 +148,16 @@ public class ClientDialogSimple {
 
 
         mainGrid.add(name,0,1);
+    }
+
+    private static void errorReadINIDileMessage(){
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.setTitle("Ошибка чтения файла");
+        alert.setHeaderText("Настройки невозможны из-за повреждения файла");
+        alert.setContentText("Восстановите пожалуйста файл");
+        alert.showAndWait();
+        BattleshipGame.beginPlanBattlePlace("SP");
     }
 }

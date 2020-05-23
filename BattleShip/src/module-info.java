@@ -6,6 +6,8 @@ module BattleShip {
     requires javafx.media;
 
     opens battleship.controllers to javafx.fxml, javafx.graphics, javafx.controls, javafx.media;
+    opens battleship.controllers.dialogs to javafx.fxml, javafx.graphics, javafx.controls;
+
     opens battleship;
 
 }

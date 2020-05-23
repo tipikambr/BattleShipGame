@@ -76,6 +76,13 @@ public abstract class Connection implements Runnable {
                     case 'S': //Start (game)
                         if(message.equals("SG")) {
                             BattleScene.opponentReady();
+                            String finalSender3 = sender;
+                            Platform.runLater(() -> {
+                                if(finalSender3.equals("P"))
+                                    PlanOfShips.writeMessage("Системное: " + opponentName + " расставил корабли.");
+                                if(finalSender3.equals("B"))
+                                    BattleScene.writeMessage("Системное: " + opponentName + " расставил корабли.");
+                            });
                             Launcher.send("O"  ,'S');
                         }
                         if(message.equals("SO"))
@@ -211,7 +218,7 @@ public abstract class Connection implements Runnable {
                     if(finalSender2 == "B")
                         BattleScene.writeMessage("Системное: Восстановить связь не удалось.");
 
-                    BattleshipGame.beginPlanBattlePlace("S");
+                    BattleshipGame.beginPlanBattlePlace("S" + finalSender2);
                     PlanOfShips.writeMessage("Системное: Восстановить связь не удалось.");
                     PlanOfShips.lostConnection();
                 });

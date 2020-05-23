@@ -1,9 +1,10 @@
-package battleship.controllers;
+package battleship.controllers.dialogs;
 
 import battleship.BattleshipGame;
 import battleship.connection.Launcher;
 import battleship.connection.Port;
 import battleship.connection.Server;
+import battleship.controllers.PlanOfShips;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -40,6 +41,11 @@ public class ServerDialogSimple {
     static Button cancelButton;
 
     public static void init() {
+        try {
+            BattleshipGame.readINIFile();
+        } catch (Exception e) {
+            errorReadINIDileMessage();
+        }
         Parent root = BattleshipGame.getHostSimpleRoot();
         if(mainGrid == null) {
             mainGrid = (GridPane) root.lookup("#mainGrid");
@@ -51,6 +57,8 @@ public class ServerDialogSimple {
         }
         ObservableList<Port> list = FXCollections.observableArrayList(BattleshipGame.getPorts());
         portComboBox.setItems(list);
+        if(list.size() != 0)
+            portComboBox.setValue(list.get(0));
     }
 
     static void initialUI() {
@@ -205,18 +213,15 @@ public class ServerDialogSimple {
         portComboBox.setVisibleRowCount(4);
         portComboBox.setEditable(true);
         portComboBox.getEditor().textProperty().addListener(((observable, oldValue, newValue) -> {
-            if(newValue.equals(""))
-                return;
-            newValue = newValue.replaceAll("\\D", "");
-            if (newValue.length() > 5){
+            try{
+                int partIP = Integer.parseInt(newValue);
+                if(partIP > 65535)
+                    ((StringProperty)observable).setValue(oldValue);
+                else
+                    ((StringProperty)observable).setValue(newValue);
+            } catch (Exception e){
                 ((StringProperty)observable).setValue(oldValue);
-                return;
             }
-            if (Integer.parseInt(newValue) > 65535){
-                ((StringProperty)observable).setValue(oldValue);
-                return;
-            }
-            ((StringProperty)observable).setValue(newValue);
         }));
         GridPane.setHalignment(portComboBox,HPos.CENTER);
         mainGrid.add(portComboBox,0,1);
@@ -226,5 +231,16 @@ public class ServerDialogSimple {
 
     public void setTextHost(int port){
         textHost.setText("Вы хотите создать сервер с портом:\n" + port);
+    }
+
+    private static void errorReadINIDileMessage(){
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.setTitle("Ошибка чтения файла");
+        alert.setHeaderText("Настройки невозможны из-за повреждения файла");
+        alert.setContentText("Восстановите пожалуйста файл");
+        alert.showAndWait();
+        BattleshipGame.beginPlanBattlePlace("SP");
     }
 }

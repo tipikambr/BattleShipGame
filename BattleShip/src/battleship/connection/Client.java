@@ -16,13 +16,17 @@ public class Client extends Connection {
     User user;
 
     public Client(User user, String  myname) {
-        this.user = new User();
-        this.user.port = user.port;
-        this.user.ip = user.ip;
-        this.user.name = user.name;
-
+        this.user = new User(user.getName(), user.getIp(), user.getPort());
         running = false;
         this.myname = myname;
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() //Этот метод будет выполняться в побочном потоке
+            {
+                System.out.println("Привет из побочного потока!");
+            }
+        });
     }
 
     @Override
@@ -43,7 +47,7 @@ public class Client extends Connection {
         while (true)
             try {
                 if(!running ) return false;
-                client = new Socket(user.ip, user.port);
+                client = new Socket(user.getIp(), user.getPort());
                 client.setSoTimeout(BattleshipGame.getTimeOut() * 1000);
                 out = new PrintWriter(client.getOutputStream(), true, Charset.forName("windows-1251"));
                 in = new Scanner(client.getInputStream(), "windows-1251");

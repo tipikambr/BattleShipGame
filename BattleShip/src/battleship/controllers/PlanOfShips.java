@@ -79,14 +79,16 @@ public class PlanOfShips {
      */
     public static void init(String param){
         lookingForOpponent = false;
-        choosenLen = 4;
         isAdd = true;
         vertival = false;
         addingShip = new Battleship();
         globalFont = Font.font(17);
         initialImages();
-        for(int i = 0; i < 4; i++)
-            remainedNumShips[i] = 4 - i;
+        if(param.length() < 2 || param.charAt(1) != 'P'){
+            choosenLen = 4;
+            for(int i = 0; i < 4; i++)
+                remainedNumShips[i] = 4 - i;
+        }
 
         Parent root = BattleshipGame.getPlanningRoot();
 
@@ -126,6 +128,7 @@ public class PlanOfShips {
 
             initialShipMenu();
         }
+        chooseLenShip(choosenLen);
         for(int i = 0; i < 4; i++)
             updateRemainedNumOfShip(i);
         //Part about chat
@@ -734,7 +737,10 @@ public class PlanOfShips {
     static void makeAllSeaClear() {
         for(int i = 0; i < 10; i++)
             for(int j = 0; j < 10; j++)
-                makeSeaClear(i, j);
+                if(BattleshipGame.getMyOcean().whatIsHere(i,j) == 3)
+                    buttons[i][j].setStyle(Styles.getMyShipStyle());
+                else
+                    makeSeaClear(i, j);
     }
 
     /**

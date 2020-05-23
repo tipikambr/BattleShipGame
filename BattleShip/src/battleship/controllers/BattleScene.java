@@ -180,7 +180,11 @@ public class BattleScene {
             if(isOnline){
                 if(newVal.length() == 2 && newVal.matches("\\d+")){
                     sendMessage.setText("Стрелять!");
-                    sendMessage.setOnAction((actionEvent) -> shootAt(Integer.parseInt(newVal.substring(1,1)), Integer.parseInt(newVal.substring(1))));
+                    sendMessage.setOnAction((actionEvent) -> {
+                        shootAt(Integer.parseInt(String.valueOf(newVal.charAt(0))), Integer.parseInt(String.valueOf(newVal.charAt(1))));
+                        textMessage.setText("");
+                        textMessage.requestFocus();
+                    });
                     if(!isMyTurn) sendMessage.setDisable(true);
                 }
                 if(oldVal.length() == 2 && oldVal.matches("\\d+")){
