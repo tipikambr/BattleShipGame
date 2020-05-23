@@ -28,6 +28,10 @@ public class PlanOfShips {
     static Ship addingShip;
     static Font globalFont;
     static int[] remainedNumShips;
+    static boolean ctrlPressed = false;
+    static boolean choosing = false;
+    static int x;
+    static int y;
 
     @FXML
     static GridPane fullscreenGrid;
@@ -91,6 +95,8 @@ public class PlanOfShips {
         }
 
         Parent root = BattleshipGame.getPlanningRoot();
+
+        initialHotKeys(root);
 
         if(fullscreenGrid == null)
         {
@@ -159,6 +165,97 @@ public class PlanOfShips {
         lostConnection();
 
 
+    }
+
+    static void initialHotKeys(Parent root){
+        root.requestFocus();
+        root.setOnKeyPressed(e -> {
+            switch (e.getCode()){
+                case CONTROL:
+                    ctrlPressed = true;
+                    break;
+                case DIGIT1:
+                    startKeyChoosing(1);
+                    break;
+                case DIGIT2:
+                    startKeyChoosing(2);
+                    break;
+                case DIGIT3:
+                    startKeyChoosing(3);
+                    break;
+                case DIGIT4:
+                    startKeyChoosing(4);
+                    break;
+                case D:
+                    startDeliting();
+                    break;
+                case R:
+                    if(!choosing)
+                        break;
+                    mouseExited(x,y);
+                    rotateShips();
+                    mouseEntered(x,y);
+                    break;
+                case ESCAPE:
+                    stopChoosing();
+                    break;
+                case ENTER:
+                    doThingWithShip(x, y);
+                    break;
+                case UP:
+                    mouseExited(x,y);
+                    y = (y + 9) % 10;
+                    mouseEntered(x,y);
+                    break;
+                case DOWN:
+                    mouseExited(x,y);
+                    y = (y + 1) % 10;
+                    mouseEntered(x,y);
+                    break;
+                case LEFT:
+                    mouseExited(x,y);
+                    x = (x + 9) % 10;
+                    mouseEntered(x,y);
+                    break;
+                case RIGHT:
+                    mouseExited(x,y);
+                    x = (x + 1) % 10;
+                    mouseEntered(x,y);
+                    break;
+            }
+        });
+
+        root.setOnKeyReleased(e -> {
+            if(e.getCode() == KeyCode.CONTROL){
+                ctrlPressed = false;
+            }
+        });
+    }
+
+    static void startKeyChoosing(int len){
+        if(ctrlPressed){
+            x = 0;
+            y = 0;
+            isAdd = true;
+            choosing = true;
+            makeAllSeaClear();
+            chooseLenShip(len);
+            mouseEntered(x,y);
+        }
+    }
+
+    static void startDeliting(){
+        x = 0;
+        y = 0;
+        isAdd = false;
+        choosing = true;
+        makeAllSeaClear();
+        mouseEntered(x,y);
+    }
+
+    static void stopChoosing(){
+        choosing = false;
+        makeAllSeaClear();
     }
 
     static void initialChatTableUI() {
@@ -233,6 +330,7 @@ public class PlanOfShips {
      */
     static void setShip(int x, int y){
         if(remainedNumShips[choosenLen - 1] > 0 && addingShip.okToPlaceShipAt(x, y ,!vertival, BattleshipGame.getMyOcean())) {
+            choosing = false;
             addingShip.placeShipAt(x, y, !vertival, BattleshipGame.getMyOcean());
 
             for (int k = 0; k < choosenLen; k++)
@@ -260,7 +358,7 @@ public class PlanOfShips {
      */
     static void removeShip(int x, int y){
         if(BattleshipGame.getMyOcean().whatIsHere(x, y) != 3) return;
-
+        choosing = false;
         for(int i = x; i < 10 && BattleshipGame.getMyOcean().whatIsHere(i, y) == 3; i++)
             buttons[i][y].setStyle(Styles.getNotShootedSeaStyle());
         for(int i = x - 1; i >= 0 && BattleshipGame.getMyOcean().whatIsHere(i, y) == 3; i--)
@@ -311,13 +409,21 @@ public class PlanOfShips {
                         messageText.requestFocus();
                 });
                 btn.setOnMouseClicked(event -> {
-                    if(event.getButton() == MouseButton.PRIMARY)
-                        doThingWithShip(x,y);
-                    if(event.getButton() == MouseButton.SECONDARY)
-                        rotateShips(x,y);
+                    if(!choosing){
+                        if(event.getButton() == MouseButton.PRIMARY)
+                            doThingWithShip(x,y);
+                        if(event.getButton() == MouseButton.SECONDARY)
+                            rotateShips(x,y);
+                    }
                 });
-                buttons[x][y].setOnMouseEntered(event -> mouseEntered(x, y));
-                buttons[x][y].setOnMouseExited(event -> mouseExited(x,y));
+                buttons[x][y].setOnMouseEntered(event ->{
+                    if(!choosing)
+                        mouseEntered(x, y);
+                });
+                buttons[x][y].setOnMouseExited(event -> {
+                    if(!choosing)
+                        mouseExited(x,y);
+                });
                 battlePlace.add(btn, i, j);
             }
         }
@@ -479,12 +585,7 @@ public class PlanOfShips {
         okCancelGrid.add(connectButton,2,5);
     }
 
-    /**
-     * What to do, if pressed button remove to main menu
-     * @return
-     *      {true}  -   remove to main menu
-     *      {false} -   don't remove
-     */
+
     static void confirmCancel() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);

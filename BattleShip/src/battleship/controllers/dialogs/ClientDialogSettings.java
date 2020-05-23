@@ -38,6 +38,7 @@ public class ClientDialogSettings {
     @FXML
     static GridPane buttonsGrid;
     static Button back;
+    static Button change;
     static Button add;
 
     public static void init(User user){
@@ -57,15 +58,19 @@ public class ClientDialogSettings {
             initialnameGrid();
             initialPortIPGrid();
             initialButtonsGrid();
+
+            String[] ipSplit = user.getIp().split("\\.");
+
+            nameServer.setText(user.getName());
+            for(int i = 0; i < 4; i++)
+                ip[i].setText(ipSplit[i]);
+            port.setText(String.valueOf(user.getPort()));
+            table.getItems().addAll(BattleshipGame.getUsers());
         }
 
-        String[] ipSplit = user.getIp().split("\\.");
 
-        nameServer.setText(user.getName());
-        for(int i = 0; i < 4; i++)
-            ip[i].setText(ipSplit[i]);
-        port.setText(String.valueOf(user.getPort()));
-        table.getItems().addAll(BattleshipGame.getUsers());
+
+        table.getSelectionModel().select(user);
     }
 
     static void initialTable(){
@@ -123,6 +128,7 @@ public class ClientDialogSettings {
                     }
                 };
             }
+
         });
 
 
@@ -195,6 +201,19 @@ public class ClientDialogSettings {
         back.setFont(new Font(15));
         back.setOnAction(e -> BattleshipGame.launchSimpleConnectDialog());
 
+        change = new Button("Изменить");
+        change.setPrefWidth(10000);
+        change.setFont(new Font(15));
+        change.setOnAction(e -> {
+            User changed = table.getSelectionModel().getSelectedItem();
+
+            changed.setName(nameServer.getText());
+            changed.setIp(ip[0].getText() + "." + ip[1].getText() + "." + ip[2].getText() + "." + ip[3].getText());
+            changed.setPort(Integer.parseInt(port.getText()));
+
+            BattleshipGame.updateINIFile(null, null, null);
+        });
+
         add = new Button("Добавить");
         add.setPrefWidth(10000);
         add.setFont(new Font(15));
@@ -203,19 +222,17 @@ public class ClientDialogSettings {
             next.setName(nameServer.getText());
             next.setIp(ip[0].getText() + "." + ip[1].getText() + "." + ip[2].getText() + "." + ip[3].getText());
             next.setPort(Integer.parseInt(port.getText()));
-            for(User u : table.getItems()){
-                System.out.println(u.getName() + " " + u.getIp() + " " + u.getPort());
-                System.out.println(next.getName() + " " + next.getIp() + " " + next.getPort());
+            for(User u : table.getItems())
                 if(u.equals(next))
                     return;
-            }
             table.getItems().add(next);
             BattleshipGame.getUsers().add(next);
             BattleshipGame.updateINIFile(null, next, null);
         });
 
         buttonsGrid.add(back,0,0);
-        buttonsGrid.add(add,2,0);
+        buttonsGrid.add(change, 2,0);
+        buttonsGrid.add(add,3,0);
     }
 
 }

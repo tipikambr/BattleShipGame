@@ -7,21 +7,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c6dab476-cbd4-4405-9e2c-a379622e5430" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/battleship/controllers/dialogs/ClientDialogSettings.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/battleship/resources/dialogs/client_dialog_settings.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/battleship/ai/AI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/info.ini" beforeDir="false" afterPath="$PROJECT_DIR$/info.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/BattleshipGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/BattleshipGame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/connection/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/connection/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/connection/Connection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/connection/Connection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/connection/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/connection/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/controllers/BattleScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/controllers/BattleScene.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/controllers/ClientDialogSimple.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/controllers/dialogs/ClientDialogSimple.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/battleship/controllers/PlanOfShips.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/controllers/PlanOfShips.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/controllers/ServerDialogSimple.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/controllers/dialogs/ServerDialogSimple.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/resources/dialogs/client_dialog_simple.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/resources/dialogs/client_dialog_simple.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/battleship/resources/dialogs/server_dialog_simple.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/resources/dialogs/server_dialog_simple.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/battleship/controllers/dialogs/ClientDialogSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/controllers/dialogs/ClientDialogSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/battleship/resources/dialogs/client_dialog_settings.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/battleship/resources/dialogs/client_dialog_settings.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -165,7 +156,7 @@
       <workItem from="1589724191012" duration="12313000" />
       <workItem from="1589737238488" duration="147388000" />
       <workItem from="1589971287837" duration="66584000" />
-      <workItem from="1590172463788" duration="56036000" />
+      <workItem from="1590172463788" duration="60598000" />
     </task>
     <servers />
   </component>
@@ -212,38 +203,38 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="472" y="152" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1590148501966" />
-    <state width="1491" height="189" key="GridCell.Tab.0.bottom" timestamp="1590268777791">
+    <state width="1491" height="189" key="GridCell.Tab.0.bottom" timestamp="1590273012557">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1491" height="189" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1590268777791" />
-    <state width="1491" height="189" key="GridCell.Tab.0.center" timestamp="1590268777791">
+    <state width="1491" height="189" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1590273012557" />
+    <state width="1491" height="189" key="GridCell.Tab.0.center" timestamp="1590273012556">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1491" height="189" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1590268777791" />
-    <state width="1491" height="189" key="GridCell.Tab.0.left" timestamp="1590268777791">
+    <state width="1491" height="189" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1590273012556" />
+    <state width="1491" height="189" key="GridCell.Tab.0.left" timestamp="1590273012556">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1491" height="189" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1590268777791" />
-    <state width="1491" height="189" key="GridCell.Tab.0.right" timestamp="1590268777791">
+    <state width="1491" height="189" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1590273012556" />
+    <state width="1491" height="189" key="GridCell.Tab.0.right" timestamp="1590273012557">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1491" height="189" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1590268777791" />
-    <state width="1491" height="91" key="GridCell.Tab.1.bottom" timestamp="1590265459920">
+    <state width="1491" height="189" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1590273012557" />
+    <state width="1491" height="91" key="GridCell.Tab.1.bottom" timestamp="1590272619207">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1491" height="91" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1590265459920" />
-    <state width="1491" height="91" key="GridCell.Tab.1.center" timestamp="1590265459919">
+    <state width="1491" height="91" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1590272619207" />
+    <state width="1491" height="91" key="GridCell.Tab.1.center" timestamp="1590272619207">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1491" height="91" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1590265459919" />
-    <state width="1491" height="91" key="GridCell.Tab.1.left" timestamp="1590265459919">
+    <state width="1491" height="91" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1590272619207" />
+    <state width="1491" height="91" key="GridCell.Tab.1.left" timestamp="1590272619207">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1491" height="91" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1590265459919" />
-    <state width="1491" height="91" key="GridCell.Tab.1.right" timestamp="1590265459919">
+    <state width="1491" height="91" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1590272619207" />
+    <state width="1491" height="91" key="GridCell.Tab.1.right" timestamp="1590272619207">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1491" height="91" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1590265459919" />
+    <state width="1491" height="91" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1590272619207" />
     <state x="438" y="113" width="779" height="604" key="NewModule_or_Project.wizard" timestamp="1589759256167">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
