@@ -2,6 +2,8 @@ package battleship.ships;
 
 import battleship.Ocean;
 
+import java.util.Objects;
+
 /**
  * This describes characteristics common to all the ships.
  */
@@ -193,6 +195,22 @@ public abstract class Ship {
         if (this.hit[Math.abs(row-bowRow+column-bowColumn)])
             return 1;
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ship ship = (Ship) o;
+        return bowRow == ship.bowRow &&
+                bowColumn == ship.bowColumn &&
+                length == ship.length &&
+                horisontal == ship.horisontal;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(bowRow, bowColumn, length, horisontal);
     }
 
     @Override

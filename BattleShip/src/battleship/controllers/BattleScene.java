@@ -748,7 +748,7 @@ public class BattleScene {
 
     static public void defeatMessage(int[] statistic) {
         int[] opponentStatistic = BattleshipGame.statisticNumbers();
-        String info = "Статистика:\n" +
+        String info = "Статистика:" +
                 "\nСделано ходов: " + statistic[0] + "/" + opponentStatistic[0] +
                 "\nПопаданий: " + statistic[1] + "/" + opponentStatistic[1] +
                 "\nКоличество целых кораблей: " + statistic[2] + "/" + opponentStatistic[2] +

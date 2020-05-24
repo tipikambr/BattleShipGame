@@ -256,6 +256,10 @@ public class BattleshipGame extends Application {
         return myOcean;
     }
 
+    public static void getAIOceanGenerate(){
+        myOcean = AI.generateField();
+    }
+
     /**
      * @return linq of opponent's ocean
      */

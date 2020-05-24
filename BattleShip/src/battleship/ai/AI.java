@@ -1,6 +1,7 @@
 package battleship.ai;
 
 import battleship.Ocean;
+import battleship.controllers.MainMenuScene;
 import battleship.resources.styles.Styles;
 import battleship.ships.*;
 
@@ -11,11 +12,11 @@ public class AI {
     static Ocean myOcean;
     static int[] opponentShips = new int[4];
     static int[][] opponentOcean = new int[10][10];
+    static ArrayList<Ship> sunkedShips = new ArrayList<>(0);
     static Random rand = new Random();
 
     public static void startGameAI() {
-        myOcean = new Ocean();
-        generateField();
+        myOcean = generateField();
         for (int i = 0; i < 4; i++)
             opponentShips[i] = 4 - i;
         for (int i = 0; i < 10; i++)
@@ -23,10 +24,10 @@ public class AI {
                 opponentOcean[i][j] = 0;
     }
 
-    private static void generateField() {
+    public static Ocean generateField() {
         Ship ship;
-        myOcean = new Ocean();
-        if (rand.nextInt(100) > 84) {
+        Ocean myOcean = new Ocean();
+        if (rand.nextInt(100) > 67) {
             //Четерыхпалубный не у края, тройки рядом
             if (rand.nextInt(100) > 50) {
                 //Чеырехпалубный горизонтальный
@@ -406,6 +407,7 @@ public class AI {
             //Просто рандомно
             myOcean.placeAllShipsRandomly();
         }
+        return myOcean;
     }
 
     private static Ship borderShip(int len) {
@@ -467,10 +469,11 @@ public class AI {
         int x = needToShoot[0].x;
         int y = needToShoot[0].y;
         boolean isFound = false;
+        int type = getTipeStrategy();
         int i = 0;
         int maxL = maxOpponentLen();
-
         Pair fired = isFired();
+
         if (fired != null) {
             int tx, ty;
             int max = 4 + rand.nextInt(30);
@@ -529,41 +532,85 @@ public class AI {
             }
 
         } else {
-            while (!isFound && i < 100) {
-                i++;
-                int t = rand.nextInt(needToShoot.length);
-                x = needToShoot[t].x;
-                y = needToShoot[t].y;
+            switch (type) {
+                //Strategy - looking for the longest ship
+                case 1:
+                    while (!isFound && i < 100) {
+                        i++;
+                        int t = rand.nextInt(needToShoot.length);
+                        x = needToShoot[t].x;
+                        y = needToShoot[t].y;
 
-                switch (maxL) {
-                    case 1:
-                        isFound = true;
-                        break;
-                    case 2:
-                        if (rand.nextInt(100) > 30)
-                            if (canPlus(x, y, 2))
+                        switch (maxL) {
+                            case 1:
                                 isFound = true;
-                            else if (canLine(x, y, 2))
-                                isFound = true;
-                        break;
-                    case 3:
-                        if (rand.nextInt(100) > 50)
-                            if (canPlus(x, y, 3))
-                                isFound = true;
-                            else if (canLine(x, y, 3))
-                                isFound = true;
-                        break;
-                    case 4:
-                        if (rand.nextInt(100) > 70)
-                            if (canPlus(x, y, 4))
-                                isFound = true;
-                            else if (canLine(x, y, 4))
-                                isFound = true;
-                        break;
-                    case 0:
-                        System.out.println("WTF ERROR");
-                        break;
-                }
+                                break;
+                            case 2:
+                                if (rand.nextInt(100) > 30)
+                                    if (canPlus(x, y, 2))
+                                        isFound = true;
+                                    else if (canLine(x, y, 2))
+                                        isFound = true;
+                                break;
+                            case 3:
+                                if (rand.nextInt(100) > 50)
+                                    if (canPlus(x, y, 3))
+                                        isFound = true;
+                                    else if (canLine(x, y, 3))
+                                        isFound = true;
+                                break;
+                            case 4:
+                                if (rand.nextInt(100) > 70)
+                                    if (canPlus(x, y, 4))
+                                        isFound = true;
+                                    else if (canLine(x, y, 4))
+                                        isFound = true;
+                                break;
+                            case 0:
+                                System.out.println("WTF ERROR");
+                                break;
+                        }
+
+                    }
+                    break;
+                case 2:
+                    int k = 0;
+                    Pair b = borderPair();
+                    int j = 0;
+                    while (k < 2 && j < 100){
+                        b = borderPair();
+                        k = 1;
+                        j++;
+                        if(opponentOcean[b.x][b.y] != 0)
+                            continue;
+
+                        if(b.x > 0 && b.y == 0 && opponentOcean[b.x - 1][b.y] == 0)
+                            k++;
+
+                        if(b.x < 9 && b.y == 0 && opponentOcean[b.x + 1][b.y] == 0)
+                            k++;
+
+                        if(b.x > 0 && b.y == 9 && opponentOcean[b.x - 1][b.y] == 0)
+                            k++;
+
+                        if(b.x < 9 && b.y == 9 && opponentOcean[b.x + 1][b.y] == 0)
+                            k++;
+
+                        if(b.y > 0 && b.x == 0 && opponentOcean[b.x][b.y - 1] == 0)
+                            k++;
+
+                        if(b.y < 9 && b.x == 0 && opponentOcean[b.x][b.y + 1] == 0)
+                            k++;
+
+                        if(b.y > 0 && b.x == 9 && opponentOcean[b.x][b.y - 1] == 0)
+                            k++;
+
+                        if(b.y < 9 && b.x == 9 && opponentOcean[b.x][b.y + 1] == 0)
+                            k++;
+                    }
+                    x = b.x;
+                    y = b.y;
+                    break;
 
             }
         }
@@ -573,8 +620,105 @@ public class AI {
         return res;
     }
 
+    private static Pair borderPair(){
+        switch (rand.nextInt(4) + 1) {
+            case 1:
+                return new Pair(0, rand.nextInt(10));
+            case 2:
+                return new Pair(rand.nextInt(10), 0);
+            case 3:
+                return new Pair(9, rand.nextInt(10));
+            case 4:
+                return new Pair(rand.nextInt(10), 9);
+        }
+        return null;
+    }
+
     public static boolean isDefeat() {
         return myOcean.isGameOver();
+    }
+
+    private static int getTipeStrategy() {
+        if ((nearBorder() >= 2 && maxDif() > 3) || (nearBorder() >= 4 && maxDif() > 2))
+            return 2;
+
+        if (getDefeatedCells() < 9)
+            return 1;
+
+        return 1;
+    }
+
+    private static int maxDif(){
+        int dif = 0;
+        int l = 0, r = 0;
+        while(r != 10){
+            if(opponentOcean[0][r] == 0 || l == r)
+                r++;
+            else {
+                if(dif < Math.abs(r - l))
+                    dif = Math.abs(r - l);
+                l = r;
+            }
+        }
+
+        l = 0;
+        r = 0;
+        while(r != 10){
+            if(opponentOcean[r][0] == 0 || l == r)
+                r++;
+            else {
+                if(dif < Math.abs(r - l))
+                    dif = Math.abs(r - l);
+                l = r;
+            }
+        }
+
+        l = 0;
+        r = 0;
+        while(r != 10){
+            if(opponentOcean[9][r] == 0 || l == r)
+                r++;
+            else {
+                if(dif < Math.abs(r - l))
+                    dif = Math.abs(r - l);
+                l = r;
+            }
+        }
+
+        l = 0;
+        r = 0;
+        while(r != 10){
+            if(opponentOcean[r][9] == 0 || l == r)
+                r++;
+            else {
+                if(dif < Math.abs(r - l))
+                    dif = Math.abs(r - l);
+                l = r;
+            }
+        }
+        return dif;
+    }
+
+//    private int closeShips(){
+//
+//    }
+
+    private static int nearBorder(){
+        int num = 0;
+        for(Ship ship : sunkedShips)
+            if((((ship.getBowColumn() == 0 || ship.getBowColumn() == 9) && !ship.isHorizontal()) ||
+                    ((ship.getBowRow() == 0 || ship.getBowRow() == 9) && ship.isHorizontal())))
+                    num++;
+        return num;
+    }
+
+    private static int getDefeatedCells() {
+        int n = 0;
+        for (int i = 0; i < 10; i++)
+            for (int j = 0; j < 10; j++)
+                if (opponentOcean[i][j] == 1)
+                    n++;
+        return n;
     }
 
     public static int[] getStatistic() {
@@ -594,6 +738,8 @@ public class AI {
                 opponentOcean[x + 1][y + 1] = -2;
         }
         if (type == 1) {
+            int left = x, up = y;
+            boolean hor = true;
             opponentShips[len - 1]--;
             int tx, ty;
 
@@ -601,6 +747,8 @@ public class AI {
             while (tx >= 0) {
                 if (opponentOcean[tx][y] == 2) {
                     opponentOcean[tx][y] = 1;
+                    left--;
+                    hor = true;
                     if (y > 0)
                         opponentOcean[tx][y - 1] = -2;
                     if (y < 9)
@@ -618,6 +766,7 @@ public class AI {
             tx = x + 1;
             while (tx <= 9) {
                 if (opponentOcean[tx][y] == 2) {
+                    hor = true;
                     opponentOcean[tx][y] = 1;
                     if (y > 0)
                         opponentOcean[tx][y - 1] = -2;
@@ -636,6 +785,8 @@ public class AI {
             ty = y - 1;
             while (ty >= 0) {
                 if (opponentOcean[x][ty] == 2) {
+                    hor = false;
+                    up--;
                     opponentOcean[x][ty] = 1;
                     if (x > 0)
                         opponentOcean[x - 1][ty] = -2;
@@ -654,6 +805,7 @@ public class AI {
             ty = y + 1;
             while (ty <= 9) {
                 if (opponentOcean[x][ty] == 2) {
+                    hor = false;
                     opponentOcean[x][ty] = 1;
                     if (x > 0)
                         opponentOcean[x - 1][ty] = -2;
@@ -668,6 +820,20 @@ public class AI {
                         opponentOcean[x + 1][ty] = -2;
                     break;
                 }
+            }
+            switch (len){
+                case 1:
+                    sunkedShips.add(new Submarine(up, left, hor));
+                    break;
+                case 2:
+                    sunkedShips.add(new Cruiser(up, left, hor));
+                    break;
+                case 3:
+                    sunkedShips.add(new Destroyer(up, left, hor));
+                    break;
+                case 4:
+                    sunkedShips.add(new Battleship(up, left, hor));
+                    break;
             }
         }
     }
