@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.media.Media;
@@ -104,12 +105,13 @@ public class BattleScene {
             }
 
 
-        if(chatGrid == null) {
+        if(textChat == null) {
             chatGrid = (GridPane) root.lookup("#chatFrid");
             chatScrollPane = (ScrollPane) root.lookup("#chatScrollPane");
             sendGrid = (GridPane) root.lookup("#sendGrid");
             installChatUI();
         }
+        textChat.setText(PlanOfShips.getChatLabel().getText());
 
         if(infoGrid == null) {
             infoGrid = (GridPane) root.lookup("#infoGrid");
@@ -124,13 +126,13 @@ public class BattleScene {
             textlog.setText(isMyTurn ? "Вы: " : Launcher.getName() + ": ");
         } else
         {
+            setStatistic(AI.getStatistic());
             writeMessage("Системное: " + (isMyTurn ? "Вам досталась честь ходить первым!" : "Первый ход за компьютером." ));
             textlog.setText(isMyTurn ? "Вы: " : "Компьютер: ");
             while(!isMyTurn){
                 int[] shoot = AI.makeShoot();
                 int xt = shoot[0];
                 int yt = shoot[1];
-                System.out.println(xt + " " + yt);
 
                 int rest = getShoot(xt, yt);
                 AI.getResult(xt, yt, rest, BattleshipGame.getMyOcean().ships[xt][yt].GetLength());
@@ -182,7 +184,7 @@ public class BattleScene {
     }
 
     static void installChatUI() {
-        textChat = new Label(PlanOfShips.getChatLabel().getText());
+        textChat = new Label();
         textChat.setPrefWidth(10000);
         textChat.setWrapText(true);
         textChat.heightProperty().addListener(observable -> {
@@ -227,6 +229,7 @@ public class BattleScene {
                         makeInRealMyShoot(res, x, y);
                         textMessage.setText("");
                         textMessage.requestFocus();
+                        setStatistic(AI.getStatistic());
                     });
                     if(!isMyTurn) sendMessage.setDisable(true);
                     else sendMessage.setDisable(false);
@@ -238,6 +241,19 @@ public class BattleScene {
                 }
             }
         });
+        textMessage.onKeyPressedProperty().setValue(e -> {
+            if (e.getCode() == KeyCode.ENTER && sendMessage.getText().equals("Стрелять!") && !sendMessage.isDisable()){
+                int x = Integer.parseInt(String.valueOf(textMessage.getText().charAt(0)));
+                int y = Integer.parseInt(String.valueOf(textMessage.getText().charAt(1)));
+                if(opponentOceanButtons[x][y].getStyle().equals(Styles.getNotShootedSeaStyle()) || opponentOceanButtons[x][y].getStyle().equals(Styles.getExtractedNotShootedSeaStyle())){
+                    shootAt(x, y);
+
+                    textMessage.setText("");
+                    textMessage.requestFocus();
+                }
+                }
+
+        });
 
         defeat = new Button("Сдаться");
         defeat.setPrefWidth(74);
@@ -246,8 +262,13 @@ public class BattleScene {
         defeat.setOnAction(e -> {
             if(salagaAttention()){
                 BattleshipGame.beginPlanBattlePlace("S");
-                PlanOfShips.getConnection();
-                Launcher.send("SE " + BattleshipGame.convertStatistic(), 'D');
+                PlanOfShips.writeMessage("Системное: вы БЕЖАЛИ с поля боя :с");
+                if(isOnline) {
+                    PlanOfShips.getConnection();
+                    Launcher.send("SE " + BattleshipGame.convertStatistic(), 'D');
+                } else
+                    PlanOfShips.lostConnection();
+
             }
         });
 
@@ -272,8 +293,8 @@ public class BattleScene {
         infoGrid.add(textlog,0,3);
     }
 
-    public static Label getChatLabel(){
-        return textChat;
+    public static String getChatLabel(){
+        return textChat.getText();
     }
 
     //
@@ -326,17 +347,20 @@ public class BattleScene {
             BattleshipGame.beginPlanBattlePlace("S");
             PlanOfShips.lostConnection();
         }
+        setStatistic(AI.getStatistic());
+
         while(!isMyTurn){
 
             int[] shoot = AI.makeShoot();
             int xt = shoot[0];
             int yt = shoot[1];
-            System.out.println(xt + " " + yt);
 
             int rest = getShoot(xt, yt);
             AI.getResult(xt, yt, rest, BattleshipGame.getMyOcean().ships[xt][yt].GetLength());
             if(rest < 0)
                 isMyTurn = true;
+            setStatistic(AI.getStatistic());
+
 
         }
     }
@@ -718,28 +742,21 @@ public class BattleScene {
                 "\nКоличество поврежденных кораблей: " + statistic[3] + "/" + opponentStatistic[3] +
                 "\nКоличество уничтоженных кораблей: " + statistic[4] + "/" + opponentStatistic[4];
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.setTitle("Победа!");
-        alert.setHeaderText(type == 'E' ? "Вы победили!\nПротивник бежал с поля боя." : "Вы победили!\nНо противник сражался до конца.");
-        alert.setContentText(info);
-        alert.showAndWait();
+        writeMessage("Победа!\n" +
+                (type == 'E' ? "Вы победили!\nПротивник бежал с поля боя." : "Вы победили!\nНо противник сражался до конца.") + info);
     }
 
     static public void defeatMessage(int[] statistic) {
         int[] opponentStatistic = BattleshipGame.statisticNumbers();
-        String info = "Статистика:" +
+        String info = "Статистика:\n" +
                 "\nСделано ходов: " + statistic[0] + "/" + opponentStatistic[0] +
                 "\nПопаданий: " + statistic[1] + "/" + opponentStatistic[1] +
                 "\nКоличество целых кораблей: " + statistic[2] + "/" + opponentStatistic[2] +
                 "\nКоличество поврежденных кораблей: " + statistic[3] + "/" + opponentStatistic[3] +
                 "\nКоличество уничтоженных кораблей: " + statistic[4] + "/" + opponentStatistic[4];
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.setTitle("Поражение!");
-        alert.setHeaderText("Противник оказался слишком силен для вас на этот раз.");
-        alert.setContentText(info);
-        alert.showAndWait();
+        writeMessage("Поражение!\n" +
+                "Противник оказался слишком силен для вас на этот раз.\n" + info);
+
     }
 }

@@ -19,14 +19,6 @@ public class Client extends Connection {
         this.user = new User(user.getName(), user.getIp(), user.getPort());
         running = false;
         this.myname = myname;
-
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() //Этот метод будет выполняться в побочном потоке
-            {
-                System.out.println("Привет из побочного потока!");
-            }
-        });
     }
 
     @Override

@@ -149,7 +149,8 @@ public class PlanOfShips {
             initialChatTableUI();
         }
         if(param != null && param.matches("S") && BattleScene.getChatLabel() != null){
-            chatText.setText(BattleScene.getChatLabel().getText());
+            chatText.setText(BattleScene.getChatLabel());
+            chatScrollPane.setVvalue(1.0);
         } else
             chatText.setText("");
 
@@ -200,27 +201,36 @@ public class PlanOfShips {
                     stopChoosing();
                     break;
                 case ENTER:
-                    doThingWithShip(x, y);
+                    if(choosing)
+                        doThingWithShip(x, y);
                     break;
                 case UP:
-                    mouseExited(x,y);
-                    y = (y + 9) % 10;
-                    mouseEntered(x,y);
+                    if(choosing){
+                        mouseExited(x,y);
+                        y = (y + 9) % 10;
+                        mouseEntered(x,y);
+                    }
                     break;
                 case DOWN:
-                    mouseExited(x,y);
-                    y = (y + 1) % 10;
-                    mouseEntered(x,y);
+                    if(choosing) {
+                        mouseExited(x,y);
+                        y = (y + 1) % 10;
+                        mouseEntered(x,y);
+                    }
                     break;
                 case LEFT:
-                    mouseExited(x,y);
-                    x = (x + 9) % 10;
-                    mouseEntered(x,y);
+                    if (choosing) {
+                        mouseExited(x,y);
+                        x = (x + 9) % 10;
+                        mouseEntered(x,y);
+                    }
                     break;
                 case RIGHT:
-                    mouseExited(x,y);
-                    x = (x + 1) % 10;
-                    mouseEntered(x,y);
+                    if(choosing) {
+                        mouseExited(x,y);
+                        x = (x + 1) % 10;
+                        mouseEntered(x,y);
+                    }
                     break;
             }
         });
@@ -238,6 +248,7 @@ public class PlanOfShips {
             y = 0;
             isAdd = true;
             choosing = true;
+            messageText.setDisable(true);
             makeAllSeaClear();
             chooseLenShip(len);
             mouseEntered(x,y);
@@ -249,12 +260,14 @@ public class PlanOfShips {
         y = 0;
         isAdd = false;
         choosing = true;
+        messageText.setDisable(true);
         makeAllSeaClear();
         mouseEntered(x,y);
     }
 
     static void stopChoosing(){
         choosing = false;
+        messageText.setDisable(false);
         makeAllSeaClear();
     }
 
@@ -406,7 +419,7 @@ public class PlanOfShips {
                 btn.setPrefHeight(10000);
                 buttons[x][y].focusedProperty().addListener((e, oldVal, newVal) -> {
                     if(newVal)
-                        messageText.requestFocus();
+                        removeShipButton.requestFocus();
                 });
                 btn.setOnMouseClicked(event -> {
                     if(!choosing){
@@ -587,6 +600,8 @@ public class PlanOfShips {
 
 
     static void confirmCancel() {
+        if(choosing)
+            return;
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setTitle("Подтверждение действия");
@@ -603,28 +618,40 @@ public class PlanOfShips {
      * Player want to play multiplayer :c
      */
     static void confirmSolo() {
+        if(choosing)
+            return;
         BattleshipGame.startSoloGame();
     }
 
     static void confirmMultiple() {
+        if(choosing)
+            return;
         BattleshipGame.startMultipleGame();
     }
 
     static void confirmHost() {
+        if(choosing)
+            return;
         BattleshipGame.launchSimpleHostDialog();
     }
 
     static void confirmConnect() {
+        if(choosing)
+            return;
         BattleshipGame.launchSimpleConnectDialog();
     }
 
     static void confirmStop(){
+        if(choosing)
+            return;
         lookingForOpponent = false;
-        clickedStop();
         Launcher.stop();
+        clickedStop();
     }
 
     static void confirmDisconnect(){
+        if(choosing)
+            return;
         lookingForOpponent = false;
         writeMessage("Системное: вы отключились от игры.");
         lostConnection();
@@ -635,7 +662,6 @@ public class PlanOfShips {
     static public void clickedStartHost(){
         lookingForOpponent = true;
         startButton.setDisable(true);
-
         cancelButton.setDisable(true);
 
         if(BattleshipGame.canBeServer()) {
@@ -647,6 +673,7 @@ public class PlanOfShips {
         if(BattleshipGame.canBeClient())
             connectButton.setDisable(true);
 
+        messageText.setDisable(true);
         sendMessageButton.setDisable(true);
     }
 
@@ -665,6 +692,7 @@ public class PlanOfShips {
             connectButton.setDisable(false);
         }
 
+        messageText.setDisable(true);
         sendMessageButton.setDisable(true);
     }
 
@@ -689,6 +717,7 @@ public class PlanOfShips {
             connectButton.setDisable(false);
         }
 
+        messageText.setDisable(true);
         sendMessageButton.setDisable(true);
     }
 
@@ -711,6 +740,7 @@ public class PlanOfShips {
         if(BattleshipGame.canBeClient())
             connectButton.setDisable(true);
 
+        messageText.setDisable(false);
         sendMessageButton.setDisable(false);
     }
 
@@ -741,6 +771,7 @@ public class PlanOfShips {
         } else
             connectButton.setDisable(true);
 
+        messageText.setDisable(true);
         sendMessageButton.setDisable(true);
     }
 
