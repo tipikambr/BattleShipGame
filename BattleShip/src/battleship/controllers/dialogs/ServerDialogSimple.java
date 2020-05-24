@@ -214,6 +214,14 @@ public class ServerDialogSimple {
         portComboBox.setEditable(true);
         portComboBox.getEditor().textProperty().addListener(((observable, oldValue, newValue) -> {
             try{
+                if(newValue.equals("")){
+                    ((StringProperty)observable).setValue("0");
+                    return;
+                }
+                if(oldValue.equals("0")) {
+                    ((StringProperty) observable).setValue(newValue.substring(1));
+                    return;
+                }
                 int partIP = Integer.parseInt(newValue);
                 if(partIP > 65535)
                     ((StringProperty)observable).setValue(oldValue);

@@ -203,6 +203,7 @@ public class PlanOfShips {
                 case ENTER:
                     if(choosing)
                         doThingWithShip(x, y);
+                        makeAllSeaClear();
                     break;
                 case UP:
                     if(choosing){

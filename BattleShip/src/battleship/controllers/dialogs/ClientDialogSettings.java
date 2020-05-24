@@ -136,7 +136,8 @@ public class ClientDialogSettings {
         table.setEditable(false);
 
         table.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-
+            if(newValue == null)
+                return;
             String[] ipSplit = newValue.getIp().split("\\.");
 
             nameServer.setText(newValue.getName());
@@ -182,6 +183,14 @@ public class ClientDialogSettings {
         port.setPrefWidth(10000);
         port.textProperty().addListener((observable, oldValue, newValue) -> {
             try{
+                if(newValue.equals("")){
+                    ((StringProperty)observable).setValue("0");
+                    return;
+                }
+                if(oldValue.equals("0")) {
+                    ((StringProperty) observable).setValue(newValue.substring(1));
+                    return;
+                }
                 int partIP = Integer.parseInt(newValue);
                 if(partIP > 65535)
                     ((StringProperty)observable).setValue(oldValue);
