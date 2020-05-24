@@ -2,10 +2,14 @@ package battleship.controllers;
 
 import battleship.BattleshipGame;
 import battleship.Ocean;
+import battleship.ai.AI;
 import battleship.connection.Launcher;
 import battleship.resources.messages.Messages;
 import battleship.resources.styles.Styles;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -14,9 +18,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BattleScene {
     final static String missSoundPath = BattleScene.class.getResource("/battleship/resources/sounds/miss.mp3").toString();
@@ -111,10 +117,27 @@ public class BattleScene {
             textScrollPaneLog.setFitToWidth(true);
             installInfoUI();
         }
-        Launcher.send("",'S');
-        Launcher.send("GET", 'I');
-        writeMessage("Системное: " + (isMyTurn ? "Вам досталась честь ходить первым!" : "Первый ход за " + Launcher.getName()));
-        textlog.setText(isMyTurn ? "Вы: " : Launcher.getName() + ": ");
+        if(isOnline) {
+            Launcher.send("", 'S');
+            Launcher.send("GET", 'I');
+            writeMessage("Системное: " + (isMyTurn ? "Вам досталась честь ходить первым!" : "Первый ход за " + Launcher.getName()));
+            textlog.setText(isMyTurn ? "Вы: " : Launcher.getName() + ": ");
+        } else
+        {
+            writeMessage("Системное: " + (isMyTurn ? "Вам досталась честь ходить первым!" : "Первый ход за компьютером." ));
+            textlog.setText(isMyTurn ? "Вы: " : "Компьютер: ");
+            while(!isMyTurn){
+                int[] shoot = AI.makeShoot();
+                int xt = shoot[0];
+                int yt = shoot[1];
+                System.out.println(xt + " " + yt);
+
+                int rest = getShoot(xt, yt);
+                AI.getResult(xt, yt, rest, BattleshipGame.getMyOcean().ships[xt][yt].GetLength());
+                if(rest < 0)
+                    isMyTurn = true;
+            }
+        }
     }
 
     static void installField(Button[][] buttons, GridPane battlePlace, boolean isFriendly) {
@@ -165,6 +188,7 @@ public class BattleScene {
         textChat.heightProperty().addListener(observable -> {
             chatScrollPane.setVvalue(1.0);
         });
+
         chatScrollPane.setContent(textChat);
 
         sendMessage = new Button("Отправить");
@@ -186,6 +210,7 @@ public class BattleScene {
                         textMessage.requestFocus();
                     });
                     if(!isMyTurn) sendMessage.setDisable(true);
+                    else sendMessage.setDisable(false);
                 }
                 if(oldVal.length() == 2 && oldVal.matches("\\d+")){
                     sendMessage.setText("Отправить");
@@ -193,7 +218,24 @@ public class BattleScene {
                     sendMessage.setDisable(false);
                 }
             } else {
-
+                if(newVal.length() == 2 && newVal.matches("\\d+")){
+                    sendMessage.setText("Стрелять!");
+                    sendMessage.setOnAction((actionEvent) -> {
+                        int x = Integer.parseInt(String.valueOf(newVal.charAt(0)));
+                        int y = Integer.parseInt(String.valueOf(newVal.charAt(1)));
+                        int res = AI.getShoot(x,y);
+                        makeInRealMyShoot(res, x, y);
+                        textMessage.setText("");
+                        textMessage.requestFocus();
+                    });
+                    if(!isMyTurn) sendMessage.setDisable(true);
+                    else sendMessage.setDisable(false);
+                }
+                if(oldVal.length() == 2 && oldVal.matches("\\d+")){
+                    sendMessage.setText("Отправить");
+                    sendMessage.setOnAction((actionEvent) -> sendMessage());
+                    sendMessage.setDisable(true);
+                }
             }
         });
 
@@ -256,19 +298,47 @@ public class BattleScene {
     }
 
     static void shootAt(int x, int y){
-        if(!isMyTurn) {
+        if (!isMyTurn) {
             messageNotMyTurn();
             return;
         }
-        if(!isReady) {
-            messageNotTimeYet();
+        if(isOnline) {
+
+            if (!isReady) {
+                messageNotTimeYet();
+                return;
+            }
+            opponentOceanButtons[x][y].setOnAction(null);
+            textlog.setText(textlog.getText() + " выстрелили по координатам (" + x + ";" + y + ")\n");
+            Launcher.send(" " + x + " " + y, 'A');
+            Launcher.send("GET", 'I');
+            isMyTurn = false;
             return;
         }
+
+        int res = AI.getShoot(x,y);
         opponentOceanButtons[x][y].setOnAction(null);
-        textlog.setText(textlog.getText() + " выстрелили по координатам (" + x + ";" + y +")\n");
-        Launcher.send(" " + x + " " + y, 'A');
-        Launcher.send("GET", 'I');
-        isMyTurn = false;
+        if(res <= 0)
+            isMyTurn = false;
+        makeInRealMyShoot(res, x, y);
+        if (AI.isDefeat()){
+            winMessage(AI.getStatistic(), 'F');
+            BattleshipGame.beginPlanBattlePlace("S");
+            PlanOfShips.lostConnection();
+        }
+        while(!isMyTurn){
+
+            int[] shoot = AI.makeShoot();
+            int xt = shoot[0];
+            int yt = shoot[1];
+            System.out.println(xt + " " + yt);
+
+            int rest = getShoot(xt, yt);
+            AI.getResult(xt, yt, rest, BattleshipGame.getMyOcean().ships[xt][yt].GetLength());
+            if(rest < 0)
+                isMyTurn = true;
+
+        }
     }
 
     static public int getShoot(int x, int y){
@@ -279,14 +349,21 @@ public class BattleScene {
                 textlog.setText(textlog.getText() + Messages.ShootInSeaMessages() + "\n\nВы: ");
                 break;
             case 1:
-                textlog.setText(textlog.getText() + Messages.DestroyShipMessage() + "\n\n" + Launcher.getName() + ": ");
+                if(isOnline)
+                    textlog.setText(textlog.getText() + Messages.DestroyShipMessage() + "\n\n" + Launcher.getName() + ": ");
+                else
+                    textlog.setText(textlog.getText() + Messages.DestroyShipMessage() + "\n\n" + "Компьютер: ");
                 break;
             case 2:
-                textlog.setText(textlog.getText() + Messages.ShootInShipMessages() + "\n\n" + Launcher.getName() + ": ");
+                if(isOnline)
+                    textlog.setText(textlog.getText() + Messages.ShootInShipMessages() + "\n\n" + Launcher.getName() + ": ");
+                else
+                    textlog.setText(textlog.getText() + Messages.ShootInShipMessages() + "\n\n" + "Компьютер: ");
                 break;
         }
         makeMySeaSquareTruth(myOceanButtons[x][y], BattleshipGame.getMyOcean(), x, y);
-        Launcher.send("GET", 'I');
+        if(isOnline)
+            Launcher.send("GET", 'I');
         if(type != 1 && type != 2){
             isMyTurn = true;
             missShoot.seek(new Duration(0.0));
@@ -297,9 +374,16 @@ public class BattleScene {
             aimShoot.play();
         }
         if(BattleshipGame.getMyOcean().isGameOver()) {
-            BattleshipGame.beginPlanBattlePlace("S");
-            PlanOfShips.getConnection();
-            Launcher.send("SF " + BattleshipGame.convertStatistic(), 'D');
+            if(isOnline){
+                BattleshipGame.beginPlanBattlePlace("S");
+                PlanOfShips.getConnection();
+                Launcher.send("SF " + BattleshipGame.convertStatistic(), 'D');
+            } else {
+                defeatMessage(AI.getStatistic());
+                BattleshipGame.beginPlanBattlePlace("S");
+                PlanOfShips.lostConnection();
+                return -5;
+            }
         }
         return type;
     }
@@ -357,7 +441,12 @@ public class BattleScene {
                 missShoot.seek(new Duration(0));
                 missShoot.play();
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getShootedSeaStyle(), Styles.getExtractedShootedSeaStyle(), true);
-                textlog.setText(textlog.getText() + Messages.ShootInSeaMessages() + "\n\n" + Launcher.getName() + ": ");
+                if(isOnline)
+                    textlog.setText(textlog.getText() + Messages.ShootInSeaMessages() + "\n\n" + Launcher.getName() + ": ");
+                else {
+                    textlog.setText(textlog.getText() + Messages.ShootInSeaMessages() + "\n\n" + "Компьютер: ");
+                    isMyTurn = false;
+                }
                 break;
             case 0:
                 settingStyleButton(opponentOceanButtons[x][y], Styles.getNotShootedSeaStyle(), Styles.getExtractedNotShootedSeaStyle(), true);

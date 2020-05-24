@@ -1,5 +1,6 @@
 package battleship;
 
+import battleship.ai.AI;
 import battleship.connection.Launcher;
 import battleship.connection.Port;
 import battleship.connection.User;
@@ -320,8 +321,7 @@ public class BattleshipGame extends Application {
     }
 
     public static void startSoloGame() {
-        opponentOcean = new Ocean();
-        opponentOcean.placeAllShipsRandomly();
+        AI.startGameAI();
         BattleScene.init(false, random.nextBoolean());
         application.getScene().setRoot(battleRoot);
     }
