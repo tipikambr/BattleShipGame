@@ -166,6 +166,14 @@ public class ClientDialogSettings {
             ip[i].setPrefWidth(10000);
             ip[i].textProperty().addListener((observable, oldValue, newValue) -> {
                 try{
+                    if(newValue.equals("")){
+                        ((StringProperty)observable).setValue("0");
+                        return;
+                    }
+                    if(oldValue.equals("0")) {
+                        ((StringProperty) observable).setValue(newValue.substring(1));
+                        return;
+                    }
                     int partIP = Integer.parseInt(newValue);
                     if(partIP > 255)
                         ((StringProperty)observable).setValue(oldValue);
@@ -228,7 +236,7 @@ public class ClientDialogSettings {
         add.setFont(new Font(15));
         add.setOnAction(e -> {
             User next = new User();
-            next.setName(nameServer.getText());
+            next.setName(nameServer.getText().equals("")? "Новое подключение" : nameServer.getText());
             next.setIp(ip[0].getText() + "." + ip[1].getText() + "." + ip[2].getText() + "." + ip[3].getText());
             next.setPort(Integer.parseInt(port.getText()));
             for(User u : table.getItems())

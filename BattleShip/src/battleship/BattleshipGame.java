@@ -188,6 +188,8 @@ public class BattleshipGame extends Application {
 
     static public void updateINIFile(Port chosenPort, User chosenUser, String chosenName) {
         PrintWriter out = null;
+        if (chosenName != null && chosenName.equals(""))
+            chosenName = "Новое подключение";
         try{
             File f = new File(connectionStreamInput);
             out = new PrintWriter(f,"windows-1251");
