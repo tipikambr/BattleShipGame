@@ -237,10 +237,6 @@ public class ServerDialogSimple {
 
     }
 
-    public void setTextHost(int port){
-        textHost.setText("Вы хотите создать сервер с портом:\n" + port);
-    }
-
     private static void errorReadINIDileMessage(){
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

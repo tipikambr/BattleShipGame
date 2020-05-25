@@ -224,10 +224,13 @@ public class ClientDialogSettings {
         change.setOnAction(e -> {
             User changed = table.getSelectionModel().getSelectedItem();
 
+            table.getItems().removeAll(BattleshipGame.getUsers());
             changed.setName(nameServer.getText());
             changed.setIp(ip[0].getText() + "." + ip[1].getText() + "." + ip[2].getText() + "." + ip[3].getText());
             changed.setPort(Integer.parseInt(port.getText()));
 
+            table.getItems().addAll(BattleshipGame.getUsers());
+            table.getSelectionModel().select(changed);
             BattleshipGame.updateINIFile(null, null, null);
         });
 
